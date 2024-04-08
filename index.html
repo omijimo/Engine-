@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Project Proposal
+    </title>
+</head>
+<body>
+    <h1 align="middle">Final Project Proposal: Engine<sup>2</sup> (subject to change)</h1>
+    <h2 align="middle">Aaron Xu, Henry Khaung, Abrar Karim, Wil Rothman</h2>
+    
+    <h2>Project Summary</h2>
+    <p>
+        With Engine<sup>2</sup>, we aim to create a 2D physics sandbox capable of simulating realistic particle physics and spring body masses. 
+        As the engine is 2-dimensional, we want to dedicate as many resources as possible towards creating a realistic physics simulation and less 
+        resources towards realistic visual effects such as lighting. Ideally, the final result would be a game of sorts, where the user can 
+        drop in physics objects and add forces and changes to the environment, watching the simulation update in real time. By creating a robust 
+        framework to create and update objects, we hope to be able to simulate solids and fluids with a wide range of physical properties.
+    </p>
+    <h2>Problem Description</h2>
+    <p>
+       Modern physics engines often leave out one of the most important ideas of the physical world, which is the material properties of 
+        individual objects. Usually, in a game, objects may at best have basic ragdoll physics, and most physics are bound behind hard coded animations. However, 
+        in our project, we aim to create realistic real time physical simulations, fully utilizing the material properties of objects. For example, if you were to drop 
+        an object on the floor, it would break or shatter depending on the properties of the floor, the object, the height dropped, etc. In our engine, we plan to mimic these 
+        intuitive physics that make up the real world. 
+    </p>
+    <p>
+        This is challenging because materials have numerous properties that define how they interact with the world, such as tensile strength, elasticity, malleability, etc. We plan to 
+        simulate a material's most important properties in real time as they are subject to forces in order to create realistic physics simulations. For example, in hw4, we simulated a 
+        spring body cloth interacting with other physical objects. In our project, we can simulate additional material properties for a similar cloth, such as when forces would cause the cloth to 
+        tear. This is hard because we need to consider many additional factors when simulating the cloth, and update it accordingly, such as breaking springs or permanently changing springs when necessary. 
+    </p>
+
+    <h2>Goals and Deliverables</h2>
+    <p>
+        We plan to deliver a program that can effectively rasterize to the screen a 2d based physics simulation engine that can use 
+        spring bodies to simulate solid objects, such as a block or a cloth. The user should be able to interact with this simulation in real time, either by manipulating 
+        existing objects by exerting forces on them, or by spawning in new objects. The physical objects in the simulation should interact as they would in real life, 
+        experiencing <b>realistic deformation/destruction of spring bodies</b> when they are subject to forces. For example, depending on the material properties of the object, 
+        and objects can bend, tear, crack, or explode when subject to forces. As the simulation is in 2d, the graphics would mostly focus on rasterizing the edges of objects.
+    </p>
+    <p>
+        If all goes well, we hope to deliver an engine with enhanced capabilities in simulating physical properties of objects, in addition to being able to simulate fluids using particles. 
+        Namely, in addition to physical deformations, 
+        we also hope to add chemical reactions between particles. We hope to create a framework that systematically handles chemical reactions as particles collide or as certain conditions 
+        for chemical reactions are met. For example, by adding a heat slider, we can increase the temperature and change the interactions between objects, perhaps making water evaporate or 
+        making solid objects such as metal melt into particles. In addition, we hope to add more ways to interact with the program, such as by creating custom objects to drop in or by giving the 
+        user more ways to add forces or energy to the system. If possible, we would also like a web version of the program to be created so that users can interact with the program from anywhere. 
+    </p>
+    <h2>Weekly Schedule</h2>
+    <p><strong>Week 1:</strong> Figure out which 2D physics based engine to use and get familiar with the engine. Currently, we plan to download Box2D and get familiar with building and running code, using the UI and the source code. Read through the documentation as well to get a high level understanding of what the engine does. At the end, be able to create a simple interactable sandbox in the physics engine without any new materials.</p>
+<p><strong>Week 2:</strong> Begin attempting to create a framework for new objects using the chosen physics engine, experimenting with modifying source code. Add more physical properties for the object and also show these in the GUI.
+</p>
+<p><strong>Week 3:</strong> Implement a framework to create objects with a few new key material properties that can be customized for different materials. Ensure that physics simulations and physical interactions with this object are accurate</p>
+
+<p><strong>Week 4:</strong> Finish up on adding the necessary features. If time permits, begin implementing additional features, such as chemical reactions and fluids.</p>
+
+<h2>Resources</h2>
+
+  <ol>
+    <li><a href=”https://www.tapirgames.com/blog/open-source-physics-engines”>list of open source physics engines</a>
+    </li>
+    <li><a href=”https://box2d.org/documentation/index.html”> Documentation of box2D, a really popular 2d physics engine.</a>
+    </li>
+    <li><a href=””>object deformation video by 3blue1brown</a>
+    </li>
+    <li><a href=”https://www.sciencedirect.com/science/article/abs/pii/S0921509308006047”>Material properties for process simulation</a>
+    </li>
+    <li><a href=”https://www.nature.com/articles/s43588-023-00407-4 ”>Simulating short-range order in compositionally complex materials</a>
+    </li>
+    <li><a href=”https://scholarworks.calstate.edu/downloads/z890s004h”>A comprehensive analysis/explanation of various physics engines</a>
+
+    </li>
+  </ol>
+
+
+</body>
+</html>
+
