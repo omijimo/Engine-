@@ -10,6 +10,7 @@ set (TESTBED_SOURCE_FILES
 	settings.cpp
 	test.cpp
 	test.h
+  engine2.h
 	tests/add_pair.cpp
 	tests/engine2.cpp
 	tests/apply_force.cpp

@@ -23,6 +23,8 @@
 #include "test.h"
 #include "settings.h"
 #include <stdio.h>
+#include "imgui/imgui.h"
+#include "engine2.h"
 
 void DestructionListener::SayGoodbye(b2Joint* joint)
 {
@@ -144,6 +146,7 @@ public:
 void Test::MouseDown(const b2Vec2& p)
 {
 	m_mouseWorld = p;
+//  printf("m_mouseWorld, %f, %f\n", m_mouseWorld.x, m_mouseWorld.y);
 	
 	if (m_mouseJoint != NULL)
 	{
@@ -199,15 +202,16 @@ void Test::CompleteBombSpawn(const b2Vec2& p)
 	m_bombSpawning = false;
 }
 
+// overridden in engine2.cpp so that we can spawn objects at mouse cursor
 void Test::ShiftMouseDown(const b2Vec2& p)
 {
-	m_mouseWorld = p;
+  m_mouseWorld = p;
 	
 	if (m_mouseJoint != NULL)
 	{
 		return;
 	}
-
+  
 	SpawnBomb(p);
 }
 
@@ -237,18 +241,18 @@ void Test::MouseMove(const b2Vec2& p)
 
 void Test::LaunchBomb()
 {
-	b2Vec2 p(RandomFloat(-15.0f, 15.0f), 30.0f);
-	b2Vec2 v = -5.0f * p;
+
+  ImVec2 mousePos = ImGui::GetMousePos();
+  b2Vec2 p = b2Vec2(mousePos.x, mousePos.y);
+//  b2Vec2 v = 5.0f * p;
+  b2Vec2 v = p - m_bombSpawnPoint;
+  printf("LaunchBomb: %f, %f\n", v.x, v.y);
 	LaunchBomb(p, v);
 }
 
+
 void Test::LaunchBomb(const b2Vec2& position, const b2Vec2& velocity)
 {
-	if (m_bomb)
-	{
-		m_world->DestroyBody(m_bomb);
-		m_bomb = NULL;
-	}
 
 	b2BodyDef bd;
 	bd.type = b2_dynamicBody;
@@ -402,7 +406,7 @@ void Test::Step(Settings& settings)
 		c.Set(0.8f, 0.8f, 0.8f);
 		g_debugDraw.DrawSegment(m_mouseWorld, m_bombSpawnPoint, c);
 	}
-
+  
 	if (settings.m_drawContactPoints)
 	{
 		const float k_impulseScale = 0.1f;
