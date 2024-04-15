@@ -15,7 +15,7 @@ public:
     const float box_maxY = 20.0f;
     const float k_restitution = 0.0f;
     bool pushEnabled = false;
-    bool box_or_circle = 0; // 0 means box; 1, circle
+    char shape = 'b'; // 'c' means circle, 'b' means box/square, 't' means triangle
 
     Engine2();
 
@@ -25,7 +25,8 @@ public:
     void ShiftMouseDown(const b2Vec2& p) override;
     void Push(b2World* world, b2Vec2 mousePosition);
     void UpdateUI() override;
-  
+
+    void SpawnEquilateralTriangle(const b2Vec2 &p);
 };
 
 #endif // ENGINE2_H
