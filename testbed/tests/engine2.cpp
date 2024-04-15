@@ -3,6 +3,9 @@
 #include "imgui/imgui.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
+
+using namespace std;
 
 Engine2::Engine2() {
   m_world->SetGravity(b2Vec2(0.0f, -10.0f));
@@ -51,6 +54,7 @@ void Engine2::SpawnBox(const b2Vec2& p) {
 }
 
 void Engine2::SpawnCircle(const b2Vec2& p) {
+    std::cout << "spawned circle" << std::endl;
   b2CircleShape circle;
   circle.m_radius = 1.0f;
   circle.m_p.SetZero();
@@ -63,10 +67,12 @@ void Engine2::SpawnCircle(const b2Vec2& p) {
 }
   
 void Engine2::SpawnTriangle() {
-  // TODO
+    // TODO
 }
 
 void Engine2::ShiftMouseDown(const b2Vec2& p) {
+    std::cout << "Mouse shifted down" << std::endl;
+
   m_mouseWorld = p;
   
   if (m_mouseJoint != NULL)
