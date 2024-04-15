@@ -1,7 +1,7 @@
 ![Box2D Logo](https://box2d.org/images/logo.svg)
 
 # Engine$`^2`$ Description
-Engine$`^2`$ is a 2D physical sandbox primarily for particle physics and spring body massses. It has practical applications like physics simulation and video games. It was made as a final project for UC Berkeley's [Computer Science 184: Computer Graphics and Imaging][https://cs184.eecs.berkeley.edu/] class.
+Engine$`^2`$ is a 2D physical sandbox primarily for particle physics and spring body massses. It has practical applications like physics simulation and video games. It was made as a final project for UC Berkeley's [Computer Science 184: Computer Graphics and Imaging](https://cs184.eecs.berkeley.edu/) class.
 
 # Acknowledgement
 Engine$`^2`$ got its source code from Erin Catto's MIT licensed [Box2D](https://github.com/erincatto/box2d?tab=readme-ov-file), a self-described "2D physics engine for games."  
