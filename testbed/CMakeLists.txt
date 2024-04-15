@@ -10,6 +10,7 @@ set (TESTBED_SOURCE_FILES
 	settings.cpp
 	test.cpp
 	test.h
+	engine2.h
 	tests/benchmark_boxes.cpp
 	tests/add_pair.cpp
 	tests/apply_force.cpp
@@ -38,6 +39,7 @@ set (TESTBED_SOURCE_FILES
 	tests/dynamic_tree.cpp
 	tests/edge_shapes.cpp
 	tests/edge_test.cpp
+	tests/engine2.cpp
 	tests/friction.cpp
 	tests/gear_joint.cpp
 	tests/heavy1.cpp
