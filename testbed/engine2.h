@@ -22,7 +22,7 @@ public:
     void SpawnBox(const b2Vec2& p);
     void SpawnCircle(const b2Vec2& p);
     void SpawnTriangle();
-    void ShiftMouseDown(const b2Vec2& p);
+    void ShiftMouseDown(const b2Vec2& p) override;
     void Push(b2World* world, b2Vec2 mousePosition);
     void UpdateUI() override;
   
