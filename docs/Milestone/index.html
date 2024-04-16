@@ -1,45 +1,47 @@
-<!DOCTYPE html>
+<!doctype html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
 <!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" type="text/css" href="index.css">
-    </head>
-    <body>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title></title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="index.css" />
+</head>
+
+<body>
     <!-- Header -->
-        <h1 align="middle">Engine<sup>2</sup> Milestone Status Report</h1>
-        <div class="authors">
-            <div class="author">
-                <h3>Wil L. Rothman</h3>
-                <h5>University of California, Berkeley</h5>
-                <h5>wilrothman@berkeley.edu</h5>
-            </div>
-            <div class="author">
-                <h3>Aaron L. Xu</h3>
-                <h5>University of California, Berkeley</h5>
-                <h5>aaronx@berkeley.edu</h5>
-            </div>
-            <div class="author">
-                <h3>Henry B. Khaung</h3>
-                <h5>University of California, Berkeley</h5>
-                <h5>henrykhaung@berkeley.edu</h5>
-            </div>
-            <div class="author">
-                <h3>Abrar Karim</h3>
-                <h5>University of California, Berkeley</h5>
-                <h5>abrar.karim@berkeley.edu</h5>
-            </div>
+    <h1 align="middle">Engine<sup>2</sup> Milestone Status Report</h1>
+    <div class="authors">
+        <div class="author">
+            <h3>Wil L. Rothman</h3>
+            <h5>University of California, Berkeley</h5>
+            <h5>wilrothman@berkeley.edu</h5>
         </div>
+        <div class="author">
+            <h3>Aaron L. Xu</h3>
+            <h5>University of California, Berkeley</h5>
+            <h5>aaronx@berkeley.edu</h5>
+        </div>
+        <div class="author">
+            <h3>Henry B. Khaung</h3>
+            <h5>University of California, Berkeley</h5>
+            <h5>henrykhaung@berkeley.edu</h5>
+        </div>
+        <div class="author">
+            <h3>Abrar Karim</h3>
+            <h5>University of California, Berkeley</h5>
+            <h5>abrar.karim@berkeley.edu</h5>
+        </div>
+    </div>
 
     <!-- Images -->
-    <br>
+    <br />
     <div align="middle">
         <table>
             <tr>
@@ -56,44 +58,117 @@
     </div>
 
     <!-- Links -->
-    <br>
+    <br />
     <div align="middle">
-        <p><a href="https://docs.google.com/presentation/d/1s_aHiNnJV7zc-Csd4unUFqDVb9YQvOInqt_NOoXjxGk/edit?usp=sharing">Slides</a></p>
-        <p><a href="https://drive.google.com/file/d/1RGTZeETGc5LXIc2CgDfuOFv1XiNCRPEw/view?usp=sharing">Video</a></p>
+        <p>
+            <a
+                href="https://docs.google.com/presentation/d/1s_aHiNnJV7zc-Csd4unUFqDVb9YQvOInqt_NOoXjxGk/edit?usp=sharing">Slides</a>
+        </p>
+        <p>
+            <a href="https://drive.google.com/file/d/1RGTZeETGc5LXIc2CgDfuOFv1XiNCRPEw/view?usp=sharing">Video</a>
+        </p>
     </div>
 
     <!-- Page Content -->
-    <pre class="subsection">        ABSTRACT</pre>
-    <p>This website concerns a final project made for UC Berkeley’s <a href="https://cs184.eecs.berkeley.edu/sp24">Computer Science 184: Computer Graphics and Imaging</a> class for undergraduate students. Our project is a 2D physics engine open-ended for changes and future improvements. This project was made by Aaron Xu, Henry Khaung, Abrar Karim, and Wil Rothman. The public GitHub repository can be found <a href="https://github.com/omijimo/Engine-?tab=readme-ov-file">here</a>.</p>
-
-    <pre class="subsection">        KEYWORDS</pre>
-    <p>Border, Collision, Engine, Objects/Primitives/Shapes, Rigid Body Physics, Simulation, Soft Body Physics</p>
-
-    <pre class="subsection">1	INTRODUCTION</pre>
-    <p>So far, we have accomplished much in our project. To start off, after checking out a few options for physics frameworks to base our engine off of, we have decided to use Erin Catto’s Box2D due to its simplicity and ease of access. Box2D contains all of the necessary components to simulate comprehensive physics simulations, and is perfect for our project. After deciding the framework to use, we all downloaded and studied the source code and documentation for Box2D. In doing so, we realized that we could easily create tests and implement our project within the built in testing environment for Box2D, which can simulate an environment with Box2D’s physics simulation engine. Starting from there, we created a new test called Engine2 to begin implementing our project.
+    <pre class="subsection"> ABSTRACT</pre>
+    <p>
+        This website concerns a final project made for UC Berkeley’s
+        <a href="https://cs184.eecs.berkeley.edu/sp24">Computer Science 184: Computer Graphics and Imaging</a>
+        class for undergraduate students. Our project is a 2D physics engine
+        open-ended for changes and future improvements. This project was made by
+        Aaron Xu, Henry Khaung, Abrar Karim, and Wil Rothman. The public GitHub
+        repository can be found
+        <a href="https://github.com/omijimo/Engine-?tab=readme-ov-file">here</a>.
     </p>
 
-    <pre class="subsection">2	WORLD</pre>
-    <p>In order to contain primitives (also known as “shapes” or “objects”) in our simulation, we created a rectangular border that is not affected by gravity or any other properties of physics. This rectangle will be our “world” in which we spawn primitives and have them interact with each other. In the future, we may try to add new worlds with different shapes and environments.
+    <pre class="subsection"> KEYWORDS</pre>
+    <p>
+        Border, Collision, Engine, Objects/Primitives/Shapes, Rigid Body Physics,
+        Simulation, Soft Body Physics
     </p>
 
-    <pre class="subsection">3	PRIMITIVE GENERATION</pre>
-    <p>The Box2D starter code was very basic and did not include support for spawning multiple primitives at once, and only allowed the user to spawn small circles on the interface. This simulation was too simplistic for our project, so we decided to add support for multiple primitives, including circles and squares. To do this, we implemented a feature where users can spawn a selected primitive at the position of their mouse cursor using shift click. We also added support for dragging primitives around as opposed to simply spawning them. In the future, we plan to implement a feature that allows users to select an already spawned or yet to be spawned primitive and change its material properties. Currently, spawned primitives have predetermined properties, such as size and mass.
+    <pre class="subsection">1 INTRODUCTION</pre>
+    <p>
+        So far, we have accomplished much in our project. To start off, after
+        checking out a few options for physics frameworks to base our engine off
+        of, we have decided to use Erin Catto’s Box2D due to its simplicity and
+        ease of access. Box2D contains all of the necessary components to simulate
+        comprehensive physics simulations, and is perfect for our project. After
+        deciding the framework to use, we all downloaded and studied the source
+        code and documentation for Box2D. In doing so, we realized that we could
+        easily create tests and implement our project within the built in testing
+        environment for Box2D, which can simulate an environment with Box2D’s
+        physics simulation engine. Starting from there, we created a new test
+        called Engine2 to begin implementing our project.
     </p>
 
-    <pre class="subsection">4	FORCES</pre>
-    <p>Currently there are only two forces acting upon the primitives: gravity and user defined force (which can be applied through clicking and then dragging). Users can interact with primitives by clicking on a primitive to lift, push, and pull. We plan to add a feature that changes the mouse cursor to exert a constant pushing force around it, as well as other forces that can be exhibited by the mouse, such as creating a pendulum-like effect with the mouse when holding primities, or maybe sucking in nearby primitives.
+    <pre class="subsection">2 WORLD</pre>
+    <p>
+        In order to contain primitives (also known as “shapes” or “objects”) in
+        our simulation, we created a rectangular border that is not affected by
+        gravity or any other properties of physics. This rectangle will be our
+        “world” in which we spawn primitives and have them interact with each
+        other. In the future, we may try to add new worlds with different shapes
+        and environments.
     </p>
 
-    <pre class="subsection">5   COLLISIONS</pre>
-    <p>Box2D’s source code comes with collisions implemented already so we did not have to implement this. However, collisions currently only act as rigid bodies, but we want to add soft body physics. Currently, primitives only collide with each other by pushing themselves away so that two primitives can never be overlapping. This is known as rigid body physics. We want to implement soft body physics with spring body masses which can exhibit a variety of material properties, such as hardness, strength, and elasticity, which would ultimately allow primities to interact in fundamentally different ways with themselves and the environment.
+    <pre class="subsection">3 PRIMITIVE GENERATION</pre>
+    <p>
+        The Box2D starter code was very basic and did not include support for
+        spawning multiple primitives at once, and only allowed the user to spawn
+        small circles on the interface. This simulation was too simplistic for our
+        project, so we decided to add support for multiple primitives, including
+        circles and squares. To do this, we implemented a feature where users can
+        spawn a selected primitive at the position of their mouse cursor using
+        shift click. We also added support for dragging primitives around as
+        opposed to simply spawning them. In the future, we plan to implement a
+        feature that allows users to select an already spawned or yet to be
+        spawned primitive and change its material properties. Currently, spawned
+        primitives have predetermined properties, such as size and mass.
     </p>
 
-    <pre class="subsection">6	CONCLUSION AND FUTURE WORK</pre>
-    <p>In conclusion, we have made good progress on our project towards our goal of creating a realistic and interactive 2d physics sandbox engine, having implemented very basic functionality of spawning objects and moving them around. Moving forward, we plan to implement custom materials and objects using spring bodies, and also continue adding more features to our simulation.
+    <pre class="subsection">4 FORCES</pre>
+    <p>
+        Currently there are only two forces acting upon the primitives: gravity
+        and user defined force (which can be applied through clicking and then
+        dragging). Users can interact with primitives by clicking on a primitive
+        to lift, push, and pull. We plan to add a feature that changes the mouse
+        cursor to exert a constant pushing force around it, as well as other
+        forces that can be exhibited by the mouse, such as creating a
+        pendulum-like effect with the mouse when holding primities, or maybe
+        sucking in nearby primitives.
     </p>
 
-    <pre class="subsection">        ACKNOWLEDGEMENTS</pre>
-    <p>This document has been fitted to ACM SIGGRAPH style, as specified <a href="https://www.siggraph.org/preparing-your-content/author-instructions/">here</a>. This website features a two-column PDF view, consistent with the guidelines. </p>
-    </body>
+    <pre class="subsection">5 COLLISIONS</pre>
+    <p>
+        Box2D’s source code comes with collisions implemented already so we did
+        not have to implement this. However, collisions currently only act as
+        rigid bodies, but we want to add soft body physics. Currently, primitives
+        only collide with each other by pushing themselves away so that two
+        primitives can never be overlapping. This is known as rigid body physics.
+        We want to implement soft body physics with spring body masses which can
+        exhibit a variety of material properties, such as hardness, strength, and
+        elasticity, which would ultimately allow primities to interact in
+        fundamentally different ways with themselves and the environment.
+    </p>
+
+    <pre class="subsection">6 CONCLUSION AND FUTURE WORK</pre>
+    <p>
+        In conclusion, we have made good progress on our project towards our goal
+        of creating a realistic and interactive 2d physics sandbox engine, having
+        implemented very basic functionality of spawning objects and moving them
+        around. Moving forward, we plan to implement custom materials and objects
+        using spring bodies, and also continue adding more features to our
+        simulation.
+    </p>
+
+    <pre class="subsection"> ACKNOWLEDGEMENTS</pre>
+    <p>
+        This document has been fitted to ACM SIGGRAPH style, as specified
+        <a href="https://www.siggraph.org/preparing-your-content/author-instructions/">here</a>. This website features a
+        two-column PDF view, consistent with the
+        guidelines.
+    </p>
+</body>
+
 </html>
