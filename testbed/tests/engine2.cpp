@@ -78,25 +78,22 @@ void Engine2::SpawnEquilateralTriangle(const b2Vec2& p) {
     const float angle = 0.0f;
 
     // `b2PolygonShape` does not include a "SetAsTriangle," so I have to do this manually by pattern matching `SetAsBox`
-    triangle.m_count = 3;       // A triangle has exactly 3 vertices
+    // triangle.m_count = 3;       // A triangle has exactly 3 vertices
     // This is a 60-60-60 equilateral triangle, so its side lengths are (x, x√(3), 2x)
-    triangle.m_vertices[0].Set(0, hs);  // the first vertex just goes directly up
+    // triangle.m_vertices[0].Set(0, hs);  // the first vertex just goes directly up
     const float height = (sqrt(3.0f) / 2.0f) * (2.0f * hs);
     const float offsetY = height / 3.0f;
-    triangle.m_vertices[0].Set(0, offsetY * 2.0f);  // Top vertex
-    triangle.m_vertices[1].Set(-hs, -offsetY);      // Bottom left vertex
-    triangle.m_vertices[2].Set(hs, -offsetY);       // Bottom right vertex
+    // triangle.m_vertices[0].Set(0, offsetY * 2.0f);  // Top vertex
+    // triangle.m_vertices[1].Set(-hs, -offsetY);      // Bottom left vertex
+    // triangle.m_vertices[2].Set(hs, -offsetY);       // Bottom right vertex
 
-    /// This doesn't fix the problem :(
-//    // I think the following is needed for collision detection.
-//    b2Transform xf;
-//    xf.p = p;
-//    xf.q.Set(angle);
-//    // Transform the vertices and normals?
-//    for (int32 i = 0; i < triangle.m_count; ++i) {
-//        triangle.m_vertices[i] = b2Mul(xf, triangle.m_vertices[i]);
-//        triangle.m_normals[i] = b2Mul(xf.q, triangle.m_normals[i]);
-//    }
+    b2Vec2 vertices[3];
+    vertices[0].Set(0.0f, hs);
+    vertices[1].Set(-hs, -offsetY);
+    vertices[2].Set(hs, -offsetY);
+    int count = 3;
+
+    triangle.Set(vertices, count);
 
     b2BodyDef bd;
     bd.type = b2_dynamicBody;   // This allows the triangle to move
