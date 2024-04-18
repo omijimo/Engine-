@@ -42,29 +42,37 @@ Engine2::Engine2() {
   }
   
 }
-  
+static float width = 1.0f;
+static float length = 1.0f;
+static float box_mass = 1.0f;
 void Engine2::SpawnBox(const b2Vec2& p) {
   b2PolygonShape box;
-  box.SetAsBox(1.0f, 1.0f, p, 0.0f);
+  box.SetAsBox(width, length, p, 0.0f);
   
   b2BodyDef bd;
   bd.type = b2_dynamicBody;
   b2Body *body = m_world->CreateBody(&bd);
-  body->CreateFixture(&box, 0.1f);
+  body->CreateFixture(&box, box_mass);
 }
+
+
+static float radius = 1.0f;
+static float circle_mass = 1.0f;
 
 void Engine2::SpawnCircle(const b2Vec2& p) {
   b2CircleShape circle;
-  circle.m_radius = 1.0f;
+  circle.m_radius = radius;
   circle.m_p.SetZero();
   
   b2BodyDef bd;
   bd.type = b2_dynamicBody;
   bd.position = p;
   b2Body *body = m_world->CreateBody(&bd);
-  body->CreateFixture(&circle, 0.1f);
+  body->CreateFixture(&circle, circle_mass);
 }
-  
+
+static float triangle_size = 1.0f;
+static float triangle_mass = 1.0f;
 void Engine2::SpawnEquilateralTriangle(const b2Vec2& p) {
     /// Made by Wil
     /**
@@ -74,7 +82,7 @@ void Engine2::SpawnEquilateralTriangle(const b2Vec2& p) {
     b2PolygonShape triangle;
 
     // Constant defining the side-length of the triangle.
-    const float hs = 1.0f;
+    const float hs = triangle_size;
     const float angle = 0.0f;
 
     // `b2PolygonShape` does not include a "SetAsTriangle," so I have to do this manually by pattern matching `SetAsBox`
@@ -99,7 +107,7 @@ void Engine2::SpawnEquilateralTriangle(const b2Vec2& p) {
     bd.type = b2_dynamicBody;   // This allows the triangle to move
     bd.position = p;
     b2Body *body = m_world->CreateBody(&bd);    // I think this spawns the triangle to the world
-    body->CreateFixture(&triangle, 0.1f);
+    body->CreateFixture(&triangle, triangle_mass);
 }
 
 void Engine2::ShiftMouseDown(const b2Vec2& p) {
@@ -151,7 +159,7 @@ void Engine2::Push(b2World* world, b2Vec2 mousePosition) {
   // Update GUI to add custom controls
 void Engine2::UpdateUI() {
   ImGui::SetNextWindowPos(ImVec2(10.0f, 100.0f));
-  ImGui::SetNextWindowSize(ImVec2(100.0f, 200.0f));
+  ImGui::SetNextWindowSize(ImVec2(200.0f, 325.0f));
   ImGui::Begin("Controls", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
   
   // Buttons to spawn our basic primitives: Box, Circle, Triangle
@@ -163,9 +171,20 @@ void Engine2::UpdateUI() {
   }
   if (ImGui::IsItemHovered()) {
     ImGui::BeginTooltip();
-    ImGui::Text("Spawns a box - currently cannot change properties");
+    ImGui::Text("Spawns a box");
     ImGui::EndTooltip();
   }
+
+    ImGui::Indent();
+
+  if (ImGui::SliderFloat("Height", &length, 0.01f, 10.0f));
+
+
+  if (ImGui::SliderFloat("Width", &width, 0.01f, 10.0f));
+
+  if (ImGui::SliderFloat("Box Mass", &box_mass, 0.1f, 100.0f));
+
+  ImGui::Unindent();
   
   if (ImGui::Button("Spawn Circle"))
   {
@@ -174,20 +193,38 @@ void Engine2::UpdateUI() {
   }
   if (ImGui::IsItemHovered()) {
     ImGui::BeginTooltip();
-    ImGui::Text("Spawns a circle - currently cannot change properties");
+    ImGui::Text("Spawns a circle");
     ImGui::EndTooltip();
   }
+  ImGui::Indent();
+
+  if (ImGui::SliderFloat("Radius", &radius, 0.01f, 10.0f));
+
+  if (ImGui::SliderFloat("Circle Mass", &circle_mass, 0.1f, 100.0f));
+
+
+  ImGui::Unindent();
   
   if (ImGui::Button("Spawn Triangle"))
   {
       shape = 't';
 //    SpawnEquilateralTriangle();
   }
+
   if (ImGui::IsItemHovered()) {
     ImGui::BeginTooltip();
-    ImGui::Text("Spawns a triangle - currently cannot change properties");
+    ImGui::Text("Spawns a triangle");
     ImGui::EndTooltip();
   }
+
+  ImGui::Indent();
+
+  if (ImGui::SliderFloat("Side Length", &triangle_size, 0.01f, 10.0f));
+
+  if (ImGui::SliderFloat("Triangle Mass", &triangle_mass, 0.1f, 100.0f));
+
+
+  ImGui::Unindent();
   
   // Push
   if (ImGui::Button(pushEnabled ? "Disable Push" : "Enable Push")) {
