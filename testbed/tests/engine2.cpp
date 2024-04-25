@@ -45,55 +45,36 @@ Engine2::Engine2() {
 static float width = 1.0f;
 static float length = 1.0f;
 static float box_mass = 1.0f;
-void Engine2::SpawnBox(const b2Vec2& p) {
+b2PolygonShape Engine2::SpawnBox(const b2Vec2& p) {
   b2PolygonShape box;
   box.SetAsBox(width, length, p, 0.0f);
-  
-  b2BodyDef bd;
-  bd.type = b2_dynamicBody;
-  b2Body *body = m_world->CreateBody(&bd);
-  body->CreateFixture(&box, box_mass);
+  return box;
 }
 
 
 static float radius = 1.0f;
 static float circle_mass = 1.0f;
-
-void Engine2::SpawnCircle(const b2Vec2& p) {
+b2CircleShape Engine2::SpawnCircle(const b2Vec2& p) {
   b2CircleShape circle;
   circle.m_radius = radius;
-  circle.m_p.SetZero();
-  
-  b2BodyDef bd;
-  bd.type = b2_dynamicBody;
-  bd.position = p;
-  b2Body *body = m_world->CreateBody(&bd);
-  body->CreateFixture(&circle, circle_mass);
+  return circle;
 }
 
 static float triangle_size = 1.0f;
 static float triangle_mass = 1.0f;
-void Engine2::SpawnEquilateralTriangle(const b2Vec2& p) {
+b2PolygonShape Engine2::SpawnEquilateralTriangle(const b2Vec2& p) {
     /// Made by Wil
     /**
      * Spawns a triangle, abstracted with barycentric coordinates
      */
-
     b2PolygonShape triangle;
 
     // Constant defining the side-length of the triangle.
-    const float hs = triangle_size;
+    const float hs = 1.0f;
     const float angle = 0.0f;
 
-    // `b2PolygonShape` does not include a "SetAsTriangle," so I have to do this manually by pattern matching `SetAsBox`
-    // triangle.m_count = 3;       // A triangle has exactly 3 vertices
-    // This is a 60-60-60 equilateral triangle, so its side lengths are (x, x√(3), 2x)
-    // triangle.m_vertices[0].Set(0, hs);  // the first vertex just goes directly up
     const float height = (sqrt(3.0f) / 2.0f) * (2.0f * hs);
     const float offsetY = height / 3.0f;
-    // triangle.m_vertices[0].Set(0, offsetY * 2.0f);  // Top vertex
-    // triangle.m_vertices[1].Set(-hs, -offsetY);      // Bottom left vertex
-    // triangle.m_vertices[2].Set(hs, -offsetY);       // Bottom right vertex
 
     b2Vec2 vertices[3];
     vertices[0].Set(0.0f, hs);
@@ -102,17 +83,11 @@ void Engine2::SpawnEquilateralTriangle(const b2Vec2& p) {
     int count = 3;
 
     triangle.Set(vertices, count);
-
-    b2BodyDef bd;
-    bd.type = b2_dynamicBody;   // This allows the triangle to move
-    bd.position = p;
-    b2Body *body = m_world->CreateBody(&bd);    // I think this spawns the triangle to the world
-    body->CreateFixture(&triangle, triangle_mass);
+  
+    return triangle;
 }
 
 void Engine2::ShiftMouseDown(const b2Vec2& p) {
-    std::cout << "Mouse shifted down" << std::endl;
-
   m_mouseWorld = p;
   
   if (m_mouseJoint != NULL)
@@ -120,19 +95,55 @@ void Engine2::ShiftMouseDown(const b2Vec2& p) {
     return;
   }
 
+  m_bombSpawnPoint = m_mouseWorld;
+  m_bombSpawning = true;
+}
 
+void Engine2::LaunchBomb(const b2Vec2& position, const b2Vec2& velocity)
+{
+  b2BodyDef bd;
+  bd.type = b2_dynamicBody;
+  bd.position = position;
+  bd.bullet = true;
+  m_bomb = m_world->CreateBody(&bd);
+  m_bomb->SetLinearVelocity(velocity);
+  
+  b2Shape *object;
   switch (shape) {
-      case 'b':     // box
-      default:
-          SpawnBox(p);
-          break;
-      case 'c':     // circle
-          SpawnCircle(p);
-          break;
-      case 't':     // triangle
-          SpawnEquilateralTriangle(p);
-          break;
-  }
+    case 'b':     // box
+    default:
+      object = new b2PolygonShape(SpawnBox(position));
+      break;
+    case 'c':     // circle
+      object = new b2CircleShape(SpawnCircle(position));
+      break;
+    case 't':     // triangle
+      object = new b2PolygonShape(SpawnEquilateralTriangle(position));
+      break;
+    }
+
+  b2FixtureDef fd;
+  fd.shape = object;
+  fd.density = 20.0f;
+  fd.restitution = 0.0f;
+  
+  b2Vec2 minV = position - b2Vec2(0.3f,0.3f);
+  b2Vec2 maxV = position + b2Vec2(0.3f,0.3f);
+  
+  b2AABB aabb;
+  aabb.lowerBound = minV;
+  aabb.upperBound = maxV;
+
+  m_bomb->CreateFixture(&fd);
+}
+
+void Engine2::CompleteBombSpawn(const b2Vec2& p)
+{
+  const float multiplier = 30.0f;
+  b2Vec2 vel = m_bombSpawnPoint - p;
+  vel *= multiplier;
+  LaunchBomb(m_bombSpawnPoint, vel);
+  m_bombSpawning = false;
 }
   
 void Engine2::Push(b2World* world, b2Vec2 mousePosition) {
@@ -236,16 +247,6 @@ void Engine2::UpdateUI() {
   if (ImGui::IsItemHovered()) {
     ImGui::BeginTooltip();
     ImGui::Text("Enabling this will make it so your mouse exerts a pushing force");
-    ImGui::EndTooltip();
-  }
-  
-  // Launch bomb
-  if (ImGui::Button("Launch bomb")) {
-    
-  }
-  if (ImGui::IsItemHovered()) {
-    ImGui::BeginTooltip();
-    ImGui::Text("To launch a bomb, press space on your keyboard. This will launch a 'bomb' (circle) to where your cursor is and this circle will persist in the world");
     ImGui::EndTooltip();
   }
   
