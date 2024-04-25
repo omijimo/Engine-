@@ -47,7 +47,7 @@ static float length = 1.0f;
 static float box_mass = 1.0f;
 b2PolygonShape Engine2::SpawnBox(const b2Vec2& p) {
   b2PolygonShape box;
-  box.SetAsBox(width, length, p, 0.0f);
+  box.SetAsBox(width, length);
   return box;
 }
 
@@ -178,7 +178,6 @@ void Engine2::UpdateUI() {
   if (ImGui::Button("Spawn Box"))
   {
     shape = 'b';
-//    SpawnBox();
   }
   if (ImGui::IsItemHovered()) {
     ImGui::BeginTooltip();
@@ -200,7 +199,6 @@ void Engine2::UpdateUI() {
   if (ImGui::Button("Spawn Circle"))
   {
     shape = 'c';
-//    SpawnCircle();
   }
   if (ImGui::IsItemHovered()) {
     ImGui::BeginTooltip();
@@ -219,7 +217,6 @@ void Engine2::UpdateUI() {
   if (ImGui::Button("Spawn Triangle"))
   {
       shape = 't';
-//    SpawnEquilateralTriangle();
   }
 
   if (ImGui::IsItemHovered()) {
