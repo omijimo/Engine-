@@ -42,26 +42,19 @@ Engine2::Engine2() {
   }
   
 }
-static float width = 1.0f;
-static float length = 1.0f;
-static float box_mass = 1.0f;
+
 b2PolygonShape Engine2::SpawnBox(const b2Vec2& p) {
   b2PolygonShape box;
   box.SetAsBox(width, length);
   return box;
 }
 
-
-static float radius = 1.0f;
-static float circle_mass = 1.0f;
 b2CircleShape Engine2::SpawnCircle(const b2Vec2& p) {
   b2CircleShape circle;
   circle.m_radius = radius;
   return circle;
 }
 
-static float triangle_size = 1.0f;
-static float triangle_mass = 1.0f;
 b2PolygonShape Engine2::SpawnEquilateralTriangle(const b2Vec2& p) {
     /// Made by Wil
     /**
@@ -125,7 +118,7 @@ void Engine2::LaunchBomb(const b2Vec2& position, const b2Vec2& velocity)
   b2FixtureDef fd;
   fd.shape = object;
   fd.density = 20.0f;
-  fd.restitution = 0.0f;
+  fd.restitution = elasticity; // for elastic collision
   
   b2Vec2 minV = position - b2Vec2(0.3f,0.3f);
   b2Vec2 maxV = position + b2Vec2(0.3f,0.3f);
@@ -146,32 +139,15 @@ void Engine2::CompleteBombSpawn(const b2Vec2& p)
   m_bombSpawning = false;
 }
   
-void Engine2::Push(b2World* world, b2Vec2 mousePosition) {
-  if (pushEnabled) {
-    b2CircleShape circle;
-    circle.m_radius = 2.0f;
-    circle.m_p.SetZero();
-    
-    b2BodyDef bd;
-    bd.type = b2_dynamicBody;
-    bd.position = mousePosition;
-    b2Body *body = m_world->CreateBody(&bd);
-    body->CreateFixture(&circle, 0.1f);
-    
-//      b2Vec2 mouseDirection = mousePosition ;
-    
-    // Iterate through bodies in the Box2D world
-//      for (b2Body* body = world->GetBodyList(); body; body = body->GetNext()) {
-//          body->ApplyForceToCenter(pushDirection, true);
-//      }
-  }
-}
-  
   // Update GUI to add custom controls
 void Engine2::UpdateUI() {
   ImGui::SetNextWindowPos(ImVec2(10.0f, 100.0f));
   ImGui::SetNextWindowSize(ImVec2(200.0f, 325.0f));
   ImGui::Begin("Controls", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+  
+  if (ImGui::SliderFloat("Elasticity", &elasticity, 0.0f, 1.0f));
+  
+  ImGui::Indent();
   
   // Buttons to spawn our basic primitives: Box, Circle, Triangle
   // Spawn by Shift + Left Mouse Click

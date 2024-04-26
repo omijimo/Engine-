@@ -16,6 +16,20 @@ public:
     const float k_restitution = 0.0f;
     bool pushEnabled = false;
     char shape = 'b'; // 'c' means circle, 'b' means box/square, 't' means triangle
+  
+    // sizes for box/square, circle, triangle
+    float width = 1.0f;
+    float length = 1.0f;
+    float box_mass = 1.0f;
+  
+    float radius = 1.0f;
+    float circle_mass = 1.0f;
+  
+    float triangle_size = 1.0f;
+    float triangle_mass = 1.0f;
+  
+    // elasticity -- applies to next spawned object
+    float elasticity = 1.0f;
 
     Engine2();
 
