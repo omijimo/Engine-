@@ -28,7 +28,7 @@ public:
 
     const float k_restitution = 0.0f;
     bool pushEnabled = false;
-    char shape = 'b'; // 'c' means circle, 'b' means box/square, 't' means triangle
+    char shape = 'b'; // 'c' means circle, 'b' means box/square, 't' means triangle, 'l' means soft body lattice
   
     // sizes for box/square, circle, triangle
     float width = 1.0f;
@@ -51,6 +51,9 @@ public:
     // elasticity -- applies to next spawned object
     float elasticity = 1.0f;
 
+    int lattice_height = 10;
+    int lattice_width = 10;
+
     Engine2();
 
     b2PolygonShape SpawnBox(const b2Vec2& p);
@@ -64,6 +67,8 @@ public:
     void SetGround();
     void ResetGravity();
 
+    // For soft bodies
+    void MakeLattice(b2Vec2 position);
 };
 
 #endif // ENGINE2_H

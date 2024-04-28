@@ -3,6 +3,7 @@
 #include "imgui/imgui.h"
 #include <ratio>
 #include <stdlib.h>
+#include "MassPoint.h"
 #include <stdio.h>
 #include <iostream>
 
@@ -130,13 +131,7 @@ void Engine2::ShiftMouseDown(const b2Vec2& p) {
 
 void Engine2::LaunchBomb(const b2Vec2& position, const b2Vec2& velocity)
 {
-  b2BodyDef bd;
-  bd.type = b2_dynamicBody;
-  bd.position = position;
-  bd.bullet = true;
-  m_bomb = m_world->CreateBody(&bd);
-  m_bomb->SetLinearVelocity(velocity);
-  
+  bool rigid_body = true;
   b2Shape *object;
   switch (shape) {
     case 'b':     // box
@@ -149,21 +144,117 @@ void Engine2::LaunchBomb(const b2Vec2& position, const b2Vec2& velocity)
     case 't':     // triangle
       object = new b2PolygonShape(SpawnEquilateralTriangle(position));
       break;
+    case 'l':     // soft body lattice
+      rigid_body = false;
+      MakeLattice(position);
+      break;
     }
 
-  b2FixtureDef fd;
-  fd.shape = object;
-  fd.density = 20.0f;
-  fd.restitution = elasticity; // for elastic collision
-  
-  b2Vec2 minV = position - b2Vec2(0.3f,0.3f);
-  b2Vec2 maxV = position + b2Vec2(0.3f,0.3f);
-  
-  b2AABB aabb;
-  aabb.lowerBound = minV;
-  aabb.upperBound = maxV;
 
-  m_bomb->CreateFixture(&fd);
+
+  if (rigid_body) {
+      b2BodyDef bd;
+      bd.type = b2_dynamicBody;
+      bd.position = position;
+      bd.bullet = true;
+      m_bomb = m_world->CreateBody(&bd);
+      m_bomb->SetLinearVelocity(velocity);
+
+      b2FixtureDef fd;
+      fd.shape = object;
+      fd.density = 20.0f;
+      fd.restitution = elasticity; // for elastic collision
+
+//      b2Vec2 minV = position - b2Vec2(0.3f, 0.3f);
+//      b2Vec2 maxV = position + b2Vec2(0.3f, 0.3f);
+//
+//      b2AABB aabb;
+//      aabb.lowerBound = minV;
+//      aabb.upperBound = maxV;
+
+      m_bomb->CreateFixture(&fd);
+  }
+}
+
+void Engine2::MakeLattice(b2Vec2 position) {
+    if (lattice_height < 1 || lattice_width < 1) {      // Edge case
+        cout << "Invalid Dimensions. " << lattice_height << " x " << lattice_width << " is not a valid rectangular soft body lattice.";
+        return;
+    }
+
+
+    // DEBUG
+    // TODO: 1x2, 2x2, nxm
+    lattice_height = 1;
+    lattice_width = 2;
+
+    b2Vec2 mp1_position = b2Vec2(position.x - 0.5f, position.y);
+    b2Vec2 mp2_position = b2Vec2(position.x + 0.5f, position.y);
+    b2Vec2 mp1_velocity = b2Vec2(0, 0);
+    b2Vec2 mp2_velocity = b2Vec2(0, 0);
+
+    MassPoint* mp1 = new MassPoint(mp1_position, mp1_velocity);
+    MassPoint* mp2 = new MassPoint(mp2_position, mp2_velocity);
+
+    b2BodyDef bd1;
+    bd1.type = b2_dynamicBody;
+    bd1.position = mp1->position;
+    bd1.bullet = true;
+    b2Body *body1 = m_world->CreateBody(&bd1);
+    m_bomb = body1;
+    m_bomb->SetLinearVelocity(mp1->velocity);
+
+    b2FixtureDef fd1;
+    b2CircleShape circle1;
+    circle1.m_radius = circle1.m_radius = mp1->radius;
+    fd1.shape = new b2CircleShape(circle1);
+    fd1.density = mp1->mass;
+    // TODO: change elasticity to our own ??
+    fd1.restitution = elasticity; // for elastic collision
+
+    m_bomb->CreateFixture(&fd1);
+
+
+    b2BodyDef bd2;
+    bd2.type = b2_dynamicBody;
+    bd2.position = mp2->position;
+    bd2.bullet = true;
+    b2Body *body2 = m_world->CreateBody(&bd2);
+    m_bomb = body2;
+    m_bomb->SetLinearVelocity(mp2->velocity);
+
+    b2FixtureDef fd2;
+    b2CircleShape circle2;
+    circle2.m_radius = circle2.m_radius = mp2->radius;
+    fd2.shape = new b2CircleShape(circle2);
+    fd2.density = mp2->mass;
+    // TODO: change elasticity to our own ??
+    fd2.restitution = elasticity; // for elastic collision
+
+    m_bomb->CreateFixture(&fd2);
+
+
+    b2Vec2 connectionPoint1 = body1->GetPosition() + b2Vec2(radius, 0);
+    //b2Vec2 connectionPoint2 = body2->GetPosition() - b2Vec2(radius, 0);
+    b2RevoluteJointDef jd;
+    jd.bodyA = body1;
+    jd.bodyB = body2;
+
+    jd.localAnchorA = body1->GetLocalPoint(connectionPoint1);
+    jd.localAnchorB = body2->GetLocalPoint(connectionPoint1);
+
+    jd.collideConnected = false; // Bodies connected by the joint should not collide
+
+    // Optionally set limits and motor features
+    // jd.enableLimit = true/false;
+    // jd.lowerAngle = ...; // example values in radians
+    // jd.upperAngle = ...; // example values in radians
+    // jd.enableMotor = true/false;
+    // jd.motorSpeed = ...; // speed in radians per second
+    // jd.maxMotorTorque = ...; // torque in N*m
+
+    // Create the joint in the world
+    b2Joint* joint = m_world->CreateJoint(&jd);
 }
 
 void Engine2::CompleteBombSpawn(const b2Vec2& p)
@@ -234,6 +325,15 @@ void Engine2::UpdateUI() {
   if (ImGui::Button("Set Gravity")) {
   ResetGravity();
   }
+
+  if (ImGui::Button("Soft Body Rectangular")) {
+      shape = 'l';      // Lattice
+  }
+
+  if (ImGui::SliderInt("Height", &lattice_height, 1, 20));
+  if (ImGui::SliderInt("Width", &lattice_width, 1, 20));
+
+
   if (ImGui::IsItemHovered()) {
     ImGui::BeginTooltip();
     ImGui::Text("Sets the gravity to the given values");

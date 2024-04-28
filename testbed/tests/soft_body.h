@@ -18,7 +18,10 @@ public:
 
     float const k_restitution = 1.f;
 
+
+
+    void Push(b2World* world, b2Vec2 mousePosition);
     void ShiftMouseDown(const b2Vec2& p);
     void CreateRect(const b2Vec2& position, const b2Vec2& velocity);
-
+    void UpdateUI();
 };
