@@ -1,0 +1,228 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-abb8ff204b706d380bdc.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.8"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "src",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-src-Debug-7d728453d55902697a6c.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.8"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "src",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "unit-test",
+					"jsonFile" : "directory-unit-test-Debug-351acbc7a0c189f714a1.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.8"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "unit-test",
+					"targetIndexes" : 
+					[
+						6
+					]
+				},
+				{
+					"build" : "extern/glad",
+					"jsonFile" : "directory-extern.glad-Debug-3702a3d5c158162a1524.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.8"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "extern/glad",
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"build" : "extern/glfw",
+					"jsonFile" : "directory-extern.glfw-Debug-be28dadd70a35a0f762f.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.8"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "extern/glfw",
+					"targetIndexes" : 
+					[
+						2
+					]
+				},
+				{
+					"build" : "extern/imgui",
+					"jsonFile" : "directory-extern.imgui-Debug-8a98c2b1876fee1ddb47.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.8"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "extern/imgui",
+					"targetIndexes" : 
+					[
+						3
+					]
+				},
+				{
+					"build" : "extern/sajson",
+					"jsonFile" : "directory-extern.sajson-Debug-5e8b01a29b4665f89f62.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.8"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "extern/sajson",
+					"targetIndexes" : 
+					[
+						4
+					]
+				},
+				{
+					"build" : "testbed",
+					"jsonFile" : "directory-testbed-Debug-35c0b35746384783206d.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.8"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "testbed",
+					"targetIndexes" : 
+					[
+						5
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7
+					],
+					"name" : "box2d",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 1,
+					"id" : "box2d::@145eef247bfb46b6828c",
+					"jsonFile" : "target-box2d-Debug-4509bacb2a2bf793efb3.json",
+					"name" : "box2d",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "glad::@6d81f930c6bec73dde7b",
+					"jsonFile" : "target-glad-Debug-fe0edc0e1c8b566d9e9d.json",
+					"name" : "glad",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "glfw::@13c6ebe2c8011b876f32",
+					"jsonFile" : "target-glfw-Debug-fc4916260e2b782621ed.json",
+					"name" : "glfw",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "imgui::@585051bfad45d3748f65",
+					"jsonFile" : "target-imgui-Debug-5f3137d602f30e69bc76.json",
+					"name" : "imgui",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 6,
+					"id" : "sajson::@c4cd55141620272a0627",
+					"jsonFile" : "target-sajson-Debug-096f26b43223ce8bff1c.json",
+					"name" : "sajson",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 7,
+					"id" : "testbed::@7f7cab772942b747dfe8",
+					"jsonFile" : "target-testbed-Debug-24ff32cd7e125fc0bd6b.json",
+					"name" : "testbed",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "unit_test::@6b123a9d5e4567f34bcb",
+					"jsonFile" : "target-unit_test-Debug-6f99f2434fae9fe7c6f6.json",
+					"name" : "unit_test",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/Wil/cs184/final-proj/cmake-build-debug-visual-studio",
+		"source" : "C:/Users/Wil/cs184/final-proj"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}

@@ -71,9 +71,13 @@ set (TESTBED_SOURCE_FILES
 	tests/web.cpp
 	tests/wheel_joint.cpp
 	tests/wrecking_ball.cpp
+		tests/SoftBody.cpp
+		tests/soft_body.h
+		tests/SoftBody.cpp
 )
 
-add_executable(testbed ${TESTBED_SOURCE_FILES})
+add_executable(testbed ${TESTBED_SOURCE_FILES}
+		tests/SoftBody.cpp)
 target_include_directories(testbed PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(testbed PUBLIC box2d glfw imgui sajson glad)
 set_target_properties(testbed PROPERTIES
