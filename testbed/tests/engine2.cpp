@@ -6,15 +6,11 @@
 #include <iostream>
 
 using namespace std;
-
-Engine2::Engine2() {
-  m_world->SetGravity(b2Vec2(0.0f, -10.0f));
-  
-  // the 'box' in which our objects exist/should not have anything outside it
+b2Body* Engine2::UpdateGround() {
   b2Body* ground;
   {
     b2BodyDef bd;
-    bd.position.Set(0.0f, 20.0f);
+    bd.position.Set(0.0f, 0.0f);
     ground = m_world->CreateBody(&bd);
     
     b2EdgeShape shape;
@@ -25,23 +21,32 @@ Engine2::Engine2() {
     sd.restitution = k_restitution;
     
     // Left vertical
-    shape.SetTwoSided(b2Vec2(-30.0f, -20.0f), b2Vec2(-30.0f, 20.0f));
+    shape.SetTwoSided(b2Vec2(box_minX, box_minY), b2Vec2(box_minX, box_maxY));
     ground->CreateFixture(&sd);
     
     // Right vertical
-    shape.SetTwoSided(b2Vec2(30.0f, -20.0f), b2Vec2(30.0f, 20.0f));
+    shape.SetTwoSided(b2Vec2(box_maxX, box_minY), b2Vec2(box_maxX, box_maxY));
     ground->CreateFixture(&sd);
     
     // Top horizontal
-    shape.SetTwoSided(b2Vec2(-30.0f, 20.0f), b2Vec2(30.0f, 20.0f));
+    shape.SetTwoSided(b2Vec2(box_minX, box_maxY), b2Vec2(box_maxX, box_maxY));
     ground->CreateFixture(&sd);
     
     // Bottom horizontal
-    shape.SetTwoSided(b2Vec2(-30.0f, -20.0f), b2Vec2(30.0f, -20.0f));
+    shape.SetTwoSided(b2Vec2(box_minX, box_minY), b2Vec2(box_maxX, box_minY));
     ground->CreateFixture(&sd);
   }
+  return ground;
+}
+Engine2::Engine2() {
+  m_world->SetGravity(b2Vec2(0.0f, -10.0f));
+  
+  // the 'box' in which our objects exist/should not have anything outside it
+  b2Body* ground = UpdateGround();
   
 }
+
+
 
 b2PolygonShape Engine2::SpawnBox(const b2Vec2& p) {
   b2PolygonShape box;
@@ -82,7 +87,7 @@ b2PolygonShape Engine2::SpawnEquilateralTriangle(const b2Vec2& p) {
 
 void Engine2::ShiftMouseDown(const b2Vec2& p) {
   m_mouseWorld = p;
-  
+
   if (m_mouseJoint != NULL)
   {
     return;
@@ -130,6 +135,27 @@ void Engine2::LaunchBomb(const b2Vec2& position, const b2Vec2& velocity)
   m_bomb->CreateFixture(&fd);
 }
 
+void Engine2::Push(b2World* world, b2Vec2 mousePosition) {
+  if (pushEnabled) {
+    b2CircleShape circle;
+    circle.m_radius = 2.0f;
+    circle.m_p.SetZero();
+
+    b2BodyDef bd;
+    bd.type = b2_dynamicBody;
+    bd.position = mousePosition;
+    b2Body *body = m_world->CreateBody(&bd);
+    body->CreateFixture(&circle, 0.1f);
+
+//      b2Vec2 mouseDirection = mousePosition ;
+
+    // Iterate through bodies in the Box2D world
+//      for (b2Body* body = world->GetBodyList(); body; body = body->GetNext()) {
+//          body->ApplyForceToCenter(pushDirection, true);
+//      }
+  }
+}
+
 void Engine2::CompleteBombSpawn(const b2Vec2& p)
 {
   const float multiplier = 30.0f;
@@ -142,17 +168,16 @@ void Engine2::CompleteBombSpawn(const b2Vec2& p)
   // Update GUI to add custom controls
 void Engine2::UpdateUI() {
   ImGui::SetNextWindowPos(ImVec2(10.0f, 100.0f));
-  ImGui::SetNextWindowSize(ImVec2(200.0f, 325.0f));
+  ImGui::SetNextWindowSize(ImVec2(290.0f, 400.0f));
   ImGui::Begin("Controls", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
   
+  ImGui::PushItemWidth(150); // Set the item width right after beginning the window
+
   if (ImGui::SliderFloat("Elasticity", &elasticity, 0.0f, 1.0f));
-  
-  ImGui::Indent();
   
   // Buttons to spawn our basic primitives: Box, Circle, Triangle
   // Spawn by Shift + Left Mouse Click
-  if (ImGui::Button("Spawn Box"))
-  {
+  if (ImGui::Button("Spawn Box")) {
     shape = 'b';
   }
   if (ImGui::IsItemHovered()) {
@@ -161,19 +186,13 @@ void Engine2::UpdateUI() {
     ImGui::EndTooltip();
   }
 
-    ImGui::Indent();
-
+  ImGui::Indent();
   if (ImGui::SliderFloat("Height", &length, 0.01f, 10.0f));
-
-
   if (ImGui::SliderFloat("Width", &width, 0.01f, 10.0f));
-
   if (ImGui::SliderFloat("Box Mass", &box_mass, 0.1f, 100.0f));
-
   ImGui::Unindent();
   
-  if (ImGui::Button("Spawn Circle"))
-  {
+  if (ImGui::Button("Spawn Circle")) {
     shape = 'c';
   }
   if (ImGui::IsItemHovered()) {
@@ -181,36 +200,26 @@ void Engine2::UpdateUI() {
     ImGui::Text("Spawns a circle");
     ImGui::EndTooltip();
   }
+  
   ImGui::Indent();
-
   if (ImGui::SliderFloat("Radius", &radius, 0.01f, 10.0f));
-
   if (ImGui::SliderFloat("Circle Mass", &circle_mass, 0.1f, 100.0f));
-
-
   ImGui::Unindent();
   
-  if (ImGui::Button("Spawn Triangle"))
-  {
-      shape = 't';
+  if (ImGui::Button("Spawn Triangle")) {
+    shape = 't';
   }
-
   if (ImGui::IsItemHovered()) {
     ImGui::BeginTooltip();
     ImGui::Text("Spawns a triangle");
     ImGui::EndTooltip();
   }
-
+  
   ImGui::Indent();
-
   if (ImGui::SliderFloat("Side Length", &triangle_size, 0.01f, 10.0f));
-
   if (ImGui::SliderFloat("Triangle Mass", &triangle_mass, 0.1f, 100.0f));
-
-
   ImGui::Unindent();
   
-  // Push
   if (ImGui::Button(pushEnabled ? "Disable Push" : "Enable Push")) {
     pushEnabled = !pushEnabled;
     ImVec2 mousePos = ImGui::GetMousePos();
@@ -222,7 +231,8 @@ void Engine2::UpdateUI() {
     ImGui::Text("Enabling this will make it so your mouse exerts a pushing force");
     ImGui::EndTooltip();
   }
-  
+
+  ImGui::PopItemWidth(); // Reset the item width after setting all sliders and buttons
   ImGui::End();
 }
 

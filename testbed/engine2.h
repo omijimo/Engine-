@@ -41,6 +41,8 @@ public:
     void CompleteBombSpawn(const b2Vec2& p) override;
     void Push(b2World* world, b2Vec2 mousePosition);
     void UpdateUI() override;
+    b2Body* UpdateGround();
+
 };
 
 #endif // ENGINE2_H
