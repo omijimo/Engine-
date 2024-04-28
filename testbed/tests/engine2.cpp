@@ -135,27 +135,6 @@ void Engine2::LaunchBomb(const b2Vec2& position, const b2Vec2& velocity)
   m_bomb->CreateFixture(&fd);
 }
 
-void Engine2::Push(b2World* world, b2Vec2 mousePosition) {
-  if (pushEnabled) {
-    b2CircleShape circle;
-    circle.m_radius = 2.0f;
-    circle.m_p.SetZero();
-
-    b2BodyDef bd;
-    bd.type = b2_dynamicBody;
-    bd.position = mousePosition;
-    b2Body *body = m_world->CreateBody(&bd);
-    body->CreateFixture(&circle, 0.1f);
-
-//      b2Vec2 mouseDirection = mousePosition ;
-
-    // Iterate through bodies in the Box2D world
-//      for (b2Body* body = world->GetBodyList(); body; body = body->GetNext()) {
-//          body->ApplyForceToCenter(pushDirection, true);
-//      }
-  }
-}
-
 void Engine2::CompleteBombSpawn(const b2Vec2& p)
 {
   const float multiplier = 30.0f;
@@ -219,18 +198,6 @@ void Engine2::UpdateUI() {
   if (ImGui::SliderFloat("Side Length", &triangle_size, 0.01f, 10.0f));
   if (ImGui::SliderFloat("Triangle Mass", &triangle_mass, 0.1f, 100.0f));
   ImGui::Unindent();
-  
-  if (ImGui::Button(pushEnabled ? "Disable Push" : "Enable Push")) {
-    pushEnabled = !pushEnabled;
-    ImVec2 mousePos = ImGui::GetMousePos();
-    b2Vec2 b2_mousePos = b2Vec2(mousePos.x, mousePos.y);
-    Push(m_world, b2_mousePos);
-  }
-  if (ImGui::IsItemHovered()) {
-    ImGui::BeginTooltip();
-    ImGui::Text("Enabling this will make it so your mouse exerts a pushing force");
-    ImGui::EndTooltip();
-  }
 
   ImGui::PopItemWidth(); // Reset the item width after setting all sliders and buttons
   ImGui::End();

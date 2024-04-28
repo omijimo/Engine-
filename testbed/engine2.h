@@ -39,7 +39,6 @@ public:
     void ShiftMouseDown(const b2Vec2& p) override;
     void LaunchBomb(const b2Vec2& position, const b2Vec2& velocity) override;
     void CompleteBombSpawn(const b2Vec2& p) override;
-    void Push(b2World* world, b2Vec2 mousePosition);
     void UpdateUI() override;
     b2Body* UpdateGround();
 
