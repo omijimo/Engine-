@@ -54,5 +54,6 @@
 #include "b2_revolute_joint.h"
 #include "b2_weld_joint.h"
 #include "b2_wheel_joint.h"
+#include "b2_soft_body_joint.h"
 
 #endif

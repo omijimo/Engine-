@@ -405,6 +405,9 @@ private:
 	friend class b2WeldJoint;
 	friend class b2WheelJoint;
 
+    // mine :3
+    friend class b2SoftBodyJoint;
+
 	// m_flags
 	enum
 	{
