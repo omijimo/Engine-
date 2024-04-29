@@ -1,4 +1,10 @@
 set (TESTBED_SOURCE_FILES
+		tests/particle.h
+		tests/particleSystem.cpp
+		tests/particleSystem.h
+		tests/MassPoint.h
+		tests/MassPoint.cpp
+		tests/soft_body.h
 		draw.cpp
 		draw.h
 		imgui_impl_glfw.cpp

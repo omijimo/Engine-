@@ -22,7 +22,7 @@ MassPoint::MassPoint() {
 
     b2Body* ground;
     {
-        /// Solen from engine2.cpp
+        /// Stolen from engine2.cpp
         b2BodyDef bd;
         bd.position.Set(0.0f, 20.0f);
         ground = m_world->CreateBody(&bd);

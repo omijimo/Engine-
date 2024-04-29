@@ -34,7 +34,8 @@ public:
         }
         return 1 / mass * force;
     };
-
+    
+    MassPoint();
 
     MassPoint(b2Vec2 posn, b2Vec2 vel) {
         position = posn;

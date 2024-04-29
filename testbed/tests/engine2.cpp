@@ -1,13 +1,51 @@
 #include "test.h"
-#include "engine2.h"
-#include "imgui/imgui.h"
-#include <stdlib.h>
-#include "MassPoint.h"
+#include "settings.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include "imgui/imgui.h"
 #include <iostream>
 #include <vector>
 
+#include "engine2.h"
+#include "MassPoint.h"
+#include "particleSystem.h"
+
+
 using namespace std;
+
+class QueryCallback : public b2QueryCallback
+{
+public:
+  QueryCallback(const b2Vec2& point)
+  {
+    m_point = point;
+    m_fixture = NULL;
+  }
+  
+  bool ReportFixture(b2Fixture* fixture) override
+  {
+    b2Body* body = fixture->GetBody();
+    if (body->GetType() == b2_dynamicBody)
+    {
+      bool inside = fixture->TestPoint(m_point);
+      if (inside)
+      {
+        m_fixture = fixture;
+        
+        // We are done, terminate the query.
+        return false;
+      }
+    }
+    
+    // Continue the query.
+    return true;
+  }
+  
+  b2Vec2 m_point;
+  b2Fixture* m_fixture;
+};
+
+
 b2Body* Engine2::UpdateGround() {
     b2Body* ground;
     {
@@ -45,7 +83,6 @@ Engine2::Engine2() {
 
     // the 'box' in which our objects exist/should not have anything outside it
     b2Body* ground = UpdateGround();
-
 }
 
 
@@ -85,6 +122,50 @@ b2PolygonShape Engine2::SpawnEquilateralTriangle(const b2Vec2& p) {
     triangle.Set(vertices, count);
 
     return triangle;
+}
+
+void Engine2::MouseDown(const b2Vec2& p)
+{
+  m_mouseWorld = p;
+  
+  if (m_mouseJoint != NULL)
+  {
+    return;
+  }
+  
+  if (particleFlag) {
+    // Create particles at the mouse position
+//    engine_particleSys.createParticle(engine_particleDef, p, m_world); --> im thinking make this function private
+    engine_particleSys.createParticlesAroundMouse(engine_particleDef, p, 1.0f, 100, m_world);
+  } else {
+    // Make a small box.
+    b2AABB aabb;
+    b2Vec2 d;
+    d.Set(0.001f, 0.001f);
+    aabb.lowerBound = p - d;
+    aabb.upperBound = p + d;
+    
+    // Query the world for overlapping shapes.
+    QueryCallback callback(p);
+    m_world->QueryAABB(&callback, aabb);
+    
+    if (callback.m_fixture)
+    {
+      float frequencyHz = 5.0f;
+      float dampingRatio = 0.7f;
+      
+      b2Body* body = callback.m_fixture->GetBody();
+      b2MouseJointDef jd;
+      jd.bodyA = m_groundBody;
+      jd.bodyB = body;
+      jd.target = p;
+      jd.maxForce = 1000.0f * body->GetMass();
+      b2LinearStiffness(jd.stiffness, jd.damping, frequencyHz, dampingRatio, jd.bodyA, jd.bodyB);
+      
+      m_mouseJoint = (b2MouseJoint*)m_world->CreateJoint(&jd);
+      body->SetAwake(true);
+    }
+  }
 }
 
 void Engine2::ShiftMouseDown(const b2Vec2& p) {
@@ -250,28 +331,6 @@ void Engine2::CreateJoint(b2Body* body_a, b2Body* body_b) {
 
 }
 
-
-void Engine2::Push(b2World* world, b2Vec2 mousePosition) {
-    if (pushEnabled) {
-        b2CircleShape circle;
-        circle.m_radius = 2.0f;
-        circle.m_p.SetZero();
-
-        b2BodyDef bd;
-        bd.type = b2_dynamicBody;
-        bd.position = mousePosition;
-        b2Body *body = m_world->CreateBody(&bd);
-        body->CreateFixture(&circle, 0.1f);
-
-//      b2Vec2 mouseDirection = mousePosition ;
-
-        // Iterate through bodies in the Box2D world
-//      for (b2Body* body = world->GetBodyList(); body; body = body->GetNext()) {
-//          body->ApplyForceToCenter(pushDirection, true);
-//      }
-    }
-}
-
 void Engine2::CompleteBombSpawn(const b2Vec2& p)
 {
     const float multiplier = 30.0f;
@@ -336,13 +395,6 @@ void Engine2::UpdateUI() {
     if (ImGui::SliderFloat("Triangle Mass", &triangle_mass, 0.1f, 100.0f));
     ImGui::Unindent();
 
-    if (ImGui::Button(pushEnabled ? "Disable Push" : "Enable Push")) {
-        pushEnabled = !pushEnabled;
-        ImVec2 mousePos = ImGui::GetMousePos();
-        b2Vec2 b2_mousePos = b2Vec2(mousePos.x, mousePos.y);
-        Push(m_world, b2_mousePos);
-    }
-
     if (ImGui::Button("Soft Body Rectangular")) {
         shape = 'l';      // Lattice
     }
@@ -353,10 +405,9 @@ void Engine2::UpdateUI() {
     if (ImGui::SliderFloat("Stiffness", &lattice_damping, 0.01f, 20.f));
 
 
-    if (ImGui::IsItemHovered()) {
-        ImGui::BeginTooltip();
-        ImGui::Text("Enabling this will make it so your mouse exerts a pushing force");
-        ImGui::EndTooltip();
+    if (ImGui::Button("Particle")) {
+        particleFlag = !particleFlag;
+        shape = 'p';
     }
 
     ImGui::PopItemWidth(); // Reset the item width after setting all sliders and buttons

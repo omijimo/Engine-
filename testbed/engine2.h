@@ -2,6 +2,7 @@
 #define ENGINE2_H
 
 #include "box2d/box2d.h"
+#include "tests/particleSystem.h"
 #include "test.h"
 #include "imgui/imgui.h"
 #include <stdlib.h>
@@ -38,16 +39,21 @@ public:
 
     float lattice_stiffness = 20.f;
     float lattice_damping = 1.f;
-
+    
+    // particle
+    bool particleFlag = false; // set true/false when clicked on corresponding button
+    particleDef engine_particleDef;
+    particleSystem engine_particleSys;
+  
     Engine2();
 
     b2PolygonShape SpawnBox(const b2Vec2& p);
     b2CircleShape SpawnCircle(const b2Vec2& p);
     b2PolygonShape SpawnEquilateralTriangle(const b2Vec2 &p);
+    void MouseDown(const b2Vec2& p) override;
     void ShiftMouseDown(const b2Vec2& p) override;
     void LaunchBomb(const b2Vec2& position, const b2Vec2& velocity) override;
     void CompleteBombSpawn(const b2Vec2& p) override;
-    void Push(b2World* world, b2Vec2 mousePosition);
     void UpdateUI() override;
     b2Body* UpdateGround();
     void CreateJoint(b2Body* body_a, b2Body* body_b);
