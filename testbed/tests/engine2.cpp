@@ -157,6 +157,8 @@ void Engine2::MakeLattice(b2Vec2 position) {
     lattice_height = 1;
     lattice_width = 2;
 
+
+
     b2Vec2 mp1_position = b2Vec2(position.x - 0.5f, position.y);
     b2Vec2 mp2_position = b2Vec2(position.x + 0.5f, position.y);
     b2Vec2 mp1_velocity = b2Vec2(0, 0);
@@ -202,12 +204,68 @@ void Engine2::MakeLattice(b2Vec2 position) {
 
     m_bomb->CreateFixture(&fd2);
 
+    lattice_height = 2;
+    lattice_width = 2;
+
+    b2Vec2 mp3_position = b2Vec2(position.x - 0.5f, position.y - 1.f);
+    b2Vec2 mp4_position = b2Vec2(position.x + 0.5f, position.y - 1.f);
+    b2Vec2 mp3_velocity = b2Vec2(0, 0);
+    b2Vec2 mp4_velocity = b2Vec2(0, 0);
+
+    MassPoint* mp3 = new MassPoint(mp3_position, mp3_velocity);
+    MassPoint* mp4 = new MassPoint(mp4_position, mp4_velocity);
+
+    b2BodyDef bd3;
+    bd3.type = b2_dynamicBody;
+    bd3.position = mp3->position;
+    bd3.bullet = true;
+    b2Body *body3 = m_world->CreateBody(&bd3);
+    m_bomb = body3;
+    m_bomb->SetLinearVelocity(mp3->velocity);
+
+    b2FixtureDef fd3;
+    b2CircleShape circle3;
+    circle3.m_radius = circle3.m_radius = mp3->radius;
+    fd3.shape = new b2CircleShape(circle3);
+    fd3.density = mp3->mass;
+    // TODO: change elasticity to our own ??
+    fd3.restitution = elasticity; // for elastic collision
+
+    m_bomb->CreateFixture(&fd3);
 
 
+    b2BodyDef bd4;
+    bd4.type = b2_dynamicBody;
+    bd4.position = mp4->position;
+    bd4.bullet = true;
+    b2Body *body4 = m_world->CreateBody(&bd4);
+    m_bomb = body4;
+    m_bomb->SetLinearVelocity(mp4->velocity);
+
+    b2FixtureDef fd4;
+    b2CircleShape circle4;
+    circle4.m_radius = circle4.m_radius = mp4->radius;
+    fd4.shape = new b2CircleShape(circle4);
+    fd4.density = mp4->mass;
+    // TODO: change elasticity to our own ??
+    fd4.restitution = elasticity; // for elastic collision
+
+    m_bomb->CreateFixture(&fd4);
+
+    //////////////////////////////////////////////////////////////////////////////
+
+    CreateJoint(body1, body2);
+    CreateJoint(body3, body4);
+    CreateJoint(body1, body3);
+    CreateJoint(body2, body4);
+    CreateJoint(body1, body4);
+    CreateJoint(body2, body3);
+}
+
+void Engine2::CreateJoint(b2Body* body_a, b2Body* body_b) {
     b2DistanceJointDef jd;
-    jd.bodyA = body1;
-    jd.bodyB = body2;
-
+    jd.bodyA = body_a;
+    jd.bodyB = body_b;
     jd.localAnchorA = b2Vec2(0, 0);
     jd.localAnchorB = b2Vec2(0, 0);
 
@@ -216,20 +274,15 @@ void Engine2::MakeLattice(b2Vec2 position) {
 
     jd.collideConnected = false; // Bodies connected by the joint should not collide
 
-    jd.stiffness = 10.f;
-    jd.damping = 0.5f;
-
-    // Optionally set limits and motor features
-    // jd.enableLimit = true/false;
-    // jd.lowerAngle = ...; // example values in radians
-    // jd.upperAngle = ...; // example values in radians
-    // jd.enableMotor = true/false;
-    // jd.motorSpeed = ...; // speed in radians per second
-    // jd.maxMotorTorque = ...; // torque in N*m
+    jd.stiffness = lattice_stiffness;
+    jd.damping = lattice_damping;
 
     // Create the joint in the world
-    b2Joint* joint = m_world->CreateJoint(&jd);
+    m_world->CreateJoint(&jd);
+
+
 }
+
 
 void Engine2::Push(b2World* world, b2Vec2 mousePosition) {
     if (pushEnabled) {
@@ -329,6 +382,8 @@ void Engine2::UpdateUI() {
 
     if (ImGui::SliderInt("Height", &lattice_height, 1, 20));
     if (ImGui::SliderInt("Width", &lattice_width, 1, 20));
+    if (ImGui::SliderFloat("Damping", &lattice_stiffness, 1.f, 50.f));
+    if (ImGui::SliderFloat("Stiffness", &lattice_damping, 0.01f, 10.f));
 
 
     if (ImGui::IsItemHovered()) {

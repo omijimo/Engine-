@@ -34,6 +34,9 @@ public:
     int lattice_height = 10;
     int lattice_width = 10;
 
+    float lattice_stiffness = 20.f;
+    float lattice_damping = 1.f;
+
     Engine2();
 
     b2PolygonShape SpawnBox(const b2Vec2& p);
@@ -45,6 +48,7 @@ public:
     void Push(b2World* world, b2Vec2 mousePosition);
     void UpdateUI() override;
     b2Body* UpdateGround();
+    void CreateJoint(b2Body* body_a, b2Body* body_b);
 
     // For soft bodies
     void MakeLattice(b2Vec2 position);
