@@ -22,7 +22,7 @@ public:
     float length = 1.0f;
     float box_mass = 1.0f;
   
-    float radius = 1.0f;
+    float radius = 25.f;
     float circle_mass = 1.0f;
   
     float triangle_size = 1.0f;
@@ -31,8 +31,10 @@ public:
     // elasticity -- applies to next spawned object
     float elasticity = 1.0f;
 
-    int lattice_height = 10;
-    int lattice_width = 10;
+    int lattice_height = 2;
+    int lattice_width = 2;
+
+    float joint_length = 0.5f;       // This is the length of non-diagonal joints
 
     float lattice_stiffness = 20.f;
     float lattice_damping = 1.f;

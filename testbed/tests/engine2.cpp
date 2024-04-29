@@ -5,6 +5,7 @@
 #include "MassPoint.h"
 #include <stdio.h>
 #include <iostream>
+#include <vector>
 
 using namespace std;
 b2Body* Engine2::UpdateGround() {
@@ -146,120 +147,85 @@ void Engine2::LaunchBomb(const b2Vec2& position, const b2Vec2& velocity)
 }
 
 void Engine2::MakeLattice(b2Vec2 position) {
+    /** Creates an n x m lattice as a soft body given `lattice_height` and `width` */
     if (lattice_height < 1 || lattice_width < 1) {      // Edge case
         cout << "Invalid Dimensions. " << lattice_height << " x " << lattice_width << " is not a valid rectangular soft body lattice.";
         return;
     }
 
+    std::vector<b2Body*> bodies;
 
-    // DEBUG
-    // TODO: 1x2, 2x2, nxm
-    lattice_height = 1;
-    lattice_width = 2;
+    cout << "Computing Lattice Geometry..." << endl;
+    for (int n = 0; n < lattice_height; n++) {
+        for (int m = 0; m < lattice_width; m++) {
+            // Defines the geometry of our joint structure
+            b2Vec2 mp_position = position
+                    - 1.f/2 * joint_length * b2Vec2((float) lattice_width, (float) lattice_height)     // first point
+                    + joint_length * b2Vec2((float) m, (float) n);
+            b2Vec2 mp_velocity = b2Vec2(0, 0);
 
+            MassPoint* mp = new MassPoint(mp_position, mp_velocity);
 
+            b2BodyDef bd;
+            bd.type = b2_dynamicBody;
+            bd.position = mp->position;
+            bd.bullet = true;
+            b2Body *body = m_world->CreateBody(&bd);
+            m_bomb = body;
+            m_bomb->SetLinearVelocity(mp->velocity);
 
-    b2Vec2 mp1_position = b2Vec2(position.x - 0.5f, position.y);
-    b2Vec2 mp2_position = b2Vec2(position.x + 0.5f, position.y);
-    b2Vec2 mp1_velocity = b2Vec2(0, 0);
-    b2Vec2 mp2_velocity = b2Vec2(0, 0);
+            b2FixtureDef fd;
+            b2CircleShape circle;
+            circle.m_radius = circle.m_radius = mp->radius;
+            fd.shape = new b2CircleShape(circle);
+            fd.density = mp->mass;
+            // TODO: change elasticity to our own ??
+            fd.restitution = elasticity; // for elastic collision
 
-    MassPoint* mp1 = new MassPoint(mp1_position, mp1_velocity);
-    MassPoint* mp2 = new MassPoint(mp2_position, mp2_velocity);
+            m_bomb->CreateFixture(&fd);
+            bodies.push_back(body);
+        }
+    }
+//    cout << "Lattice Geometry Computed!" << endl;
+//    cout << "Lattice size: " << bodies.size() << endl;
+//    cout << "Calculating Lattice Topology..." << endl;
 
-    b2BodyDef bd1;
-    bd1.type = b2_dynamicBody;
-    bd1.position = mp1->position;
-    bd1.bullet = true;
-    b2Body *body1 = m_world->CreateBody(&bd1);
-    m_bomb = body1;
-    m_bomb->SetLinearVelocity(mp1->velocity);
+    // Defines the topology of our joint structure
+    for (int n = 0; n < lattice_height; n++) {
+        for (int m = 0; m < lattice_width; m++) {
+//            cout << "n, m = " << n << ", " << m << endl;
+            // Each RigidBody needs to check if it needs down-left, down, down-right, or right joints.
+            // The other ones should already be there
 
-    b2FixtureDef fd1;
-    b2CircleShape circle1;
-    circle1.m_radius = circle1.m_radius = mp1->radius;
-    fd1.shape = new b2CircleShape(circle1);
-    fd1.density = mp1->mass;
-    // TODO: change elasticity to our own ??
-    fd1.restitution = elasticity; // for elastic collision
+//            cout << "Going into if clauses ..." << endl;
+            // Check down-left
+            if (n < lattice_height - 1 && m > 0) {
+//                cout << "Down left" << endl;
+//                std::cout << "Edge (" << n << ", " << m << ") - (" << n + 1 << ", " << m - 1 << ")" << endl;
+                CreateJoint(bodies[n * lattice_width + m], bodies[(n + 1) * lattice_width + (m - 1)]);
+            }
+            // Check down
+            if (n < lattice_height - 1) {
+//                cout << "Down" << endl;
+//                std::cout << "Edge (" << n << ", " << m << ") - (" << n + 1 << ", " << m << ")" << endl;
+                CreateJoint(bodies[n * lattice_width + m], bodies[(n + 1) * lattice_width + m]);
+            }
+            // Check down-right
+            if (n < lattice_height - 1 && m < lattice_width - 1) {
+//                cout << "Down right" << endl;
+//                std::cout << "Edge (" << n << ", " << m << ") - (" << n + 1 << ", " << m + 1 << ")" << endl;
+                CreateJoint(bodies[n * lattice_width + m], bodies[(n + 1) * lattice_width + (m + 1)]);
+            }
+            // Check right
+            if (m < lattice_width - 1) {
+//                cout << "Right" << endl;
+//                std::cout << "Edge (" << n << ", " << m << ") - (" << n << ", " << m + 1 << ")" << endl;
+                CreateJoint(bodies[n * lattice_width + m], bodies[(n * lattice_width + m + 1)]);
+            }
+        }
+    }
 
-    m_bomb->CreateFixture(&fd1);
-
-
-    b2BodyDef bd2;
-    bd2.type = b2_dynamicBody;
-    bd2.position = mp2->position;
-    bd2.bullet = true;
-    b2Body *body2 = m_world->CreateBody(&bd2);
-    m_bomb = body2;
-    m_bomb->SetLinearVelocity(mp2->velocity);
-
-    b2FixtureDef fd2;
-    b2CircleShape circle2;
-    circle2.m_radius = circle2.m_radius = mp2->radius;
-    fd2.shape = new b2CircleShape(circle2);
-    fd2.density = mp2->mass;
-    // TODO: change elasticity to our own ??
-    fd2.restitution = elasticity; // for elastic collision
-
-    m_bomb->CreateFixture(&fd2);
-
-    lattice_height = 2;
-    lattice_width = 2;
-
-    b2Vec2 mp3_position = b2Vec2(position.x - 0.5f, position.y - 1.f);
-    b2Vec2 mp4_position = b2Vec2(position.x + 0.5f, position.y - 1.f);
-    b2Vec2 mp3_velocity = b2Vec2(0, 0);
-    b2Vec2 mp4_velocity = b2Vec2(0, 0);
-
-    MassPoint* mp3 = new MassPoint(mp3_position, mp3_velocity);
-    MassPoint* mp4 = new MassPoint(mp4_position, mp4_velocity);
-
-    b2BodyDef bd3;
-    bd3.type = b2_dynamicBody;
-    bd3.position = mp3->position;
-    bd3.bullet = true;
-    b2Body *body3 = m_world->CreateBody(&bd3);
-    m_bomb = body3;
-    m_bomb->SetLinearVelocity(mp3->velocity);
-
-    b2FixtureDef fd3;
-    b2CircleShape circle3;
-    circle3.m_radius = circle3.m_radius = mp3->radius;
-    fd3.shape = new b2CircleShape(circle3);
-    fd3.density = mp3->mass;
-    // TODO: change elasticity to our own ??
-    fd3.restitution = elasticity; // for elastic collision
-
-    m_bomb->CreateFixture(&fd3);
-
-
-    b2BodyDef bd4;
-    bd4.type = b2_dynamicBody;
-    bd4.position = mp4->position;
-    bd4.bullet = true;
-    b2Body *body4 = m_world->CreateBody(&bd4);
-    m_bomb = body4;
-    m_bomb->SetLinearVelocity(mp4->velocity);
-
-    b2FixtureDef fd4;
-    b2CircleShape circle4;
-    circle4.m_radius = circle4.m_radius = mp4->radius;
-    fd4.shape = new b2CircleShape(circle4);
-    fd4.density = mp4->mass;
-    // TODO: change elasticity to our own ??
-    fd4.restitution = elasticity; // for elastic collision
-
-    m_bomb->CreateFixture(&fd4);
-
-    //////////////////////////////////////////////////////////////////////////////
-
-    CreateJoint(body1, body2);
-    CreateJoint(body3, body4);
-    CreateJoint(body1, body3);
-    CreateJoint(body2, body4);
-    CreateJoint(body1, body4);
-    CreateJoint(body2, body3);
+//    cout << "Lattice Topology Calculated!" << endl;
 }
 
 void Engine2::CreateJoint(b2Body* body_a, b2Body* body_b) {
@@ -270,12 +236,13 @@ void Engine2::CreateJoint(b2Body* body_a, b2Body* body_b) {
     jd.localAnchorB = b2Vec2(0, 0);
 
     jd.minLength = 0;
-    jd.maxLength = 2 * jd.length;
+   // jd.maxLength = 2 * jd.length;
 
     jd.collideConnected = false; // Bodies connected by the joint should not collide
 
     jd.stiffness = lattice_stiffness;
     jd.damping = lattice_damping;
+    jd.length = joint_length;
 
     // Create the joint in the world
     m_world->CreateJoint(&jd);
@@ -382,8 +349,8 @@ void Engine2::UpdateUI() {
 
     if (ImGui::SliderInt("Height", &lattice_height, 1, 20));
     if (ImGui::SliderInt("Width", &lattice_width, 1, 20));
-    if (ImGui::SliderFloat("Damping", &lattice_stiffness, 1.f, 50.f));
-    if (ImGui::SliderFloat("Stiffness", &lattice_damping, 0.01f, 10.f));
+    if (ImGui::SliderFloat("Damping", &lattice_stiffness, 1.f, 200.f));
+    if (ImGui::SliderFloat("Stiffness", &lattice_damping, 0.01f, 20.f));
 
 
     if (ImGui::IsItemHovered()) {
