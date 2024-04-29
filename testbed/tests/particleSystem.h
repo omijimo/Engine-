@@ -36,13 +36,12 @@ struct particleDef {
 
 class particleSystem : public Test {
   public:
-    particleSystem();
-//    particleSystem(particleSystemDef *def);
   
     b2PolygonShape SpawnEquilateralTriangle(const b2Vec2 &p, float scale);
   
     int createParticle(const particleDef &def, const b2Vec2 &p, b2World *world);
     void createParticlesAroundMouse(const particleDef &def, const b2Vec2 &mousePos, float radius, int numParticles, b2World *world);
+    void simulateFluidStep(std::vector<particleDef> &particles, float deltaTime);
 //    void DestroyParticle(const particleDef &def);
   
     float density = 1.0f;
@@ -56,6 +55,11 @@ class particleSystem : public Test {
     
     int p_count;
     std::vector<particleDef> particles;
+  
+    int m_nextParticleIndex = 0;
+    std::vector<b2Body*> m_bodies;
+  
+    particleSystem();
 };
 
 #endif

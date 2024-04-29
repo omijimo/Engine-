@@ -60,6 +60,8 @@ public:
 
     // For soft bodies
     void MakeLattice(b2Vec2 position);
+  
+    void Step(Settings& settings) override;
 };
 
 #endif // ENGINE2_H

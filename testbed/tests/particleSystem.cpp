@@ -70,3 +70,27 @@ void particleSystem::createParticlesAroundMouse(const particleDef &def, const b2
         createParticle(def, position, world);
     }
 }
+
+
+void simulateFluidStep(std::vector<particleDef> &particles, float deltaTime) {
+//    for each particle in particles {
+//        // Apply forces like gravity and viscosity
+//        applyGravity(particle);
+//        applyViscosity(particle);
+//        
+//        // Update particle position using Euler integration / verlet ?
+//        particle.position += particle.velocity * deltaTime;
+//        
+//        // Calculate density based on neighboring particles
+//        particle.density = calculateDensity(particle, particles);
+//    }
+//    
+//    // Apply pressure forces to each particle based on density
+//    applyPressureForces(particles);
+//    
+//    // Handle collisions with boundaries or obstacles
+//    handleCollisions(particles);
+//    
+//    // Render particles
+//    renderParticles(particles);
+}
