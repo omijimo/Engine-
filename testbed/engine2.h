@@ -7,12 +7,23 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
 class Engine2 : public Test {
 public:
-    const float box_minX = -30.0f;
-    const float box_minY = -20.0f;
-    const float box_maxX = 30.0f;
-    const float box_maxY = 20.0f;
+
+    const float originX = 0.0f;
+    const float originY = 0.0f;
+
+    float arena_width = 60.0f;
+    float arena_height = 40.0f;
+
+    float box_minX;
+    float box_minY;
+    float box_maxX;
+    float box_maxY;
+
+
+
     const float k_restitution = 0.0f;
     bool pushEnabled = false;
     char shape = 'b'; // 'c' means circle, 'b' means box/square, 't' means triangle
@@ -27,6 +38,12 @@ public:
   
     float triangle_size = 1.0f;
     float triangle_mass = 1.0f;
+
+    b2Fixture* fixtureList[4];
+    bool hasGround = false;
+    b2Body* currGround = nullptr;
+
+
   
     // elasticity -- applies to next spawned object
     float elasticity = 1.0f;
@@ -41,6 +58,7 @@ public:
     void CompleteBombSpawn(const b2Vec2& p) override;
     void UpdateUI() override;
     b2Body* UpdateGround();
+    void SetGround();
 
 };
 

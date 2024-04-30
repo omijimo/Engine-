@@ -1,12 +1,27 @@
 #include "test.h"
 #include "engine2.h"
 #include "imgui/imgui.h"
+#include <ratio>
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
 
 using namespace std;
 b2Body* Engine2::UpdateGround() {
+  float box_minX = originX - arena_width/2.0;
+  float box_minY = originY - arena_height/2.0;
+  float box_maxX = originX + arena_width/2.0;
+  float box_maxY = originY + arena_height/2.0;
+
+  if (hasGround) {
+    for (b2Fixture* f: fixtureList) {
+      currGround->DestroyFixture(f);
+    }
+  }
+  else {
+    hasGround = true;
+  }
+
   b2Body* ground;
   {
     b2BodyDef bd;
@@ -22,31 +37,39 @@ b2Body* Engine2::UpdateGround() {
     
     // Left vertical
     shape.SetTwoSided(b2Vec2(box_minX, box_minY), b2Vec2(box_minX, box_maxY));
-    ground->CreateFixture(&sd);
+    fixtureList[0] = ground->CreateFixture(&sd);
     
     // Right vertical
     shape.SetTwoSided(b2Vec2(box_maxX, box_minY), b2Vec2(box_maxX, box_maxY));
-    ground->CreateFixture(&sd);
+    fixtureList[1] = ground->CreateFixture(&sd);
     
     // Top horizontal
     shape.SetTwoSided(b2Vec2(box_minX, box_maxY), b2Vec2(box_maxX, box_maxY));
-    ground->CreateFixture(&sd);
+    fixtureList[2] = ground->CreateFixture(&sd);
     
     // Bottom horizontal
     shape.SetTwoSided(b2Vec2(box_minX, box_minY), b2Vec2(box_maxX, box_minY));
-    ground->CreateFixture(&sd);
+    fixtureList[3] = ground->CreateFixture(&sd);
   }
+  currGround = ground;
   return ground;
 }
+
+
+
 Engine2::Engine2() {
   m_world->SetGravity(b2Vec2(0.0f, -10.0f));
-  
+
   // the 'box' in which our objects exist/should not have anything outside it
-  b2Body* ground = UpdateGround();
+  currGround = UpdateGround();
+
   
 }
 
+void Engine2::SetGround() {
 
+    UpdateGround();
+}
 
 b2PolygonShape Engine2::SpawnBox(const b2Vec2& p) {
   b2PolygonShape box;
@@ -197,6 +220,20 @@ void Engine2::UpdateUI() {
   ImGui::Indent();
   if (ImGui::SliderFloat("Side Length", &triangle_size, 0.01f, 10.0f));
   if (ImGui::SliderFloat("Triangle Mass", &triangle_mass, 0.1f, 100.0f));
+  ImGui::Unindent();
+
+  if (ImGui::Button("Reset Arena")) {
+    SetGround();
+  }
+  if (ImGui::IsItemHovered()) {
+    ImGui::BeginTooltip();
+    ImGui::Text("Resets the arena with the new given dimensions");
+    ImGui::EndTooltip();
+  }
+  
+  ImGui::Indent();
+  if (ImGui::SliderFloat("Arena Width", &arena_width, 1.0f, 250.0f));
+  if (ImGui::SliderFloat("Arena Height", &arena_height, 1.0f, 250.0f));
   ImGui::Unindent();
 
   ImGui::PopItemWidth(); // Reset the item width after setting all sliders and buttons
