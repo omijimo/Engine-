@@ -902,7 +902,7 @@ void b2World::SolveTOI(const b2TimeStep& step)
 	}
 }
 
-void b2World::Step(float dt, int32 velocityIterations, int32 positionIterations)
+void b2World::Step(float dt, int32 velocityIterations, int32 positionIterations, int32 particleIterations)
 {
 	b2Timer stepTimer;
 
@@ -919,6 +919,7 @@ void b2World::Step(float dt, int32 velocityIterations, int32 positionIterations)
 	step.dt = dt;
 	step.velocityIterations	= velocityIterations;
 	step.positionIterations = positionIterations;
+  step.particleIterations = particleIterations;
 	if (dt > 0.0f)
 	{
 		step.inv_dt = 1.0f / dt;
@@ -943,6 +944,7 @@ void b2World::Step(float dt, int32 velocityIterations, int32 positionIterations)
 	if (m_stepComplete && step.dt > 0.0f)
 	{
 		b2Timer timer;
+    m_particleSystem->simulateStep()
 		Solve(step);
 		m_profile.solve = timer.GetMilliseconds();
 	}

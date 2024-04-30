@@ -30,6 +30,7 @@
 #include "b2_stack_allocator.h"
 #include "b2_time_step.h"
 #include "b2_world_callbacks.h"
+//#include "../../testbed/tests/particleSystem.h"
 
 struct b2AABB;
 struct b2BodyDef;
@@ -236,6 +237,7 @@ private:
 
 	b2Body* m_bodyList;
 	b2Joint* m_jointList;
+//  particleSystem *m_particleSystem;
 
 	int32 m_bodyCount;
 	int32 m_jointCount;

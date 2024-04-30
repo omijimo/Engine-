@@ -126,18 +126,12 @@ b2PolygonShape Engine2::SpawnEquilateralTriangle(const b2Vec2& p) {
 
 void Engine2::MouseDown(const b2Vec2& p)
 {
-  m_mouseWorld = p;
-  
-  if (m_mouseJoint != NULL)
-  {
-    return;
-  }
-  
-  if (particleFlag) {
-    // Create particles at the mouse position
-//    engine_particleSys.createParticle(engine_particleDef, p, m_world); --> im thinking make this function private
-    engine_particleSys.createParticlesAroundMouse(engine_particleDef, p, 1.0f, 100, m_world);
-  } else {
+    m_mouseWorld = p;
+    
+    if (m_mouseJoint != NULL)
+    {
+      return;
+    }
     // Make a small box.
     b2AABB aabb;
     b2Vec2 d;
@@ -165,7 +159,12 @@ void Engine2::MouseDown(const b2Vec2& p)
       m_mouseJoint = (b2MouseJoint*)m_world->CreateJoint(&jd);
       body->SetAwake(true);
     }
-  }
+    
+    if (particleFlag) {
+      // Create particles at the mouse position
+      //    engine_particleSys.createParticle(engine_particleDef, p, m_world); --> im thinking make this function private
+      engine_particleSys.createParticlesAroundMouse(engine_particleDef, p, 1.0f, 100, m_world);
+    }
 }
 
 void Engine2::ShiftMouseDown(const b2Vec2& p) {

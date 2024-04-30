@@ -39,27 +39,41 @@ class particleSystem : public Test {
   
     b2PolygonShape SpawnEquilateralTriangle(const b2Vec2 &p, float scale);
   
-    int createParticle(const particleDef &def, const b2Vec2 &p, b2World *world);
+//    int createParticle(const particleDef &def, const b2Vec2 &p, b2World *world);
     void createParticlesAroundMouse(const particleDef &def, const b2Vec2 &mousePos, float radius, int numParticles, b2World *world);
-    void simulateFluidStep(std::vector<particleDef> &particles, float deltaTime);
-//    void DestroyParticle(const particleDef &def);
+    void simulateStep(const b2TimeStep& step);
+    void SolveGravity(const b2TimeStep& step);
+    void LimitVelocity(const b2TimeStep& step);
+    void SolveCollision(const b2TimeStep& step);
   
     float density = 1.0f;
-    float gravityScale = 1.0f;
+    float gravityScale = 0.2f;
     float radius = 1.0f; // for spawning multiple at once
-    int maxCount = 0; // for limiting how much to spawn
+    float particleRadius = 0.5f; // for applying force
+    int maxCount = 500; // for limiting how much to spawn
     
     float dampingStrength = 1.0f;
     float elasticStrength = 0.25f;
     float repulsiveStrength = 1.0f;
     
-    int p_count;
-    std::vector<particleDef> particles;
+    b2World *psys_world;
+    int p_count = 0;
+    bool p_paused = false;
   
-    int m_nextParticleIndex = 0;
-    std::vector<b2Body*> m_bodies;
+    int32 psys_iterationIndex;
+    int32 psys_timestamp;
+    std::vector<particleDef> particles; // can def get rid of this
+    
+    std::vector<b2Vec2> velocityBuffer;
+    std::vector<b2Vec2> positionBuffer;
   
     particleSystem();
+    particleSystem(b2World *world, Settings& settings);
+  
+  private:
+    void applyParticleForces();
+    void applyDamping();
+  
 };
 
 #endif
