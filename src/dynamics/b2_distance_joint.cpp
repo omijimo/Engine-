@@ -400,22 +400,22 @@ void b2DistanceJoint::Draw(b2Draw* draw) const
 	b2Color c4(0.4f, 0.4f, 0.4f);
 
 	draw->DrawSegment(pA, pB, c4);
-	
+
 	b2Vec2 pRest = pA + m_length * axis;
-	draw->DrawPoint(pRest, 8.0f, c1);
+//	draw->DrawPoint(pRest, 8.0f, c1);
 
-	if (m_minLength != m_maxLength)
-	{
-		if (m_minLength > b2_linearSlop)
-		{
-			b2Vec2 pMin = pA + m_minLength * axis;
-			draw->DrawPoint(pMin, 4.0f, c2);
-		}
-
-		if (m_maxLength < FLT_MAX)
-		{
-			b2Vec2 pMax = pA + m_maxLength * axis;
-			draw->DrawPoint(pMax, 4.0f, c3);
-		}
-	}
+//	if (m_minLength != m_maxLength)
+//	{
+//		if (m_minLength > b2_linearSlop)
+//		{
+//			b2Vec2 pMin = pA + m_minLength * axis;
+//			draw->DrawPoint(pMin, 4.0f, c2);
+//		}
+//
+//		if (m_maxLength < FLT_MAX)
+//		{
+//			b2Vec2 pMax = pA + m_maxLength * axis;
+//			draw->DrawPoint(pMax, 4.0f, c3);
+//		}
+//	}
 }

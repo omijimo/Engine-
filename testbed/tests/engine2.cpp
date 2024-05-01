@@ -81,15 +81,15 @@ void Engine2::SetGround() {
 }
 
 b2PolygonShape Engine2::SpawnBox(const b2Vec2& p) {
-  b2PolygonShape box;
-  box.SetAsBox(width, length);
-  return box;
+    b2PolygonShape box;
+    box.SetAsBox(width, length);
+    return box;
 }
 
 b2CircleShape Engine2::SpawnCircle(const b2Vec2& p) {
-  b2CircleShape circle;
-  circle.m_radius = radius;
-  return circle;
+    b2CircleShape circle;
+    circle.m_radius = radius;
+    return circle;
 }
 
 b2PolygonShape Engine2::SpawnEquilateralTriangle(const b2Vec2& p) {
@@ -113,57 +113,57 @@ b2PolygonShape Engine2::SpawnEquilateralTriangle(const b2Vec2& p) {
     int count = 3;
 
     triangle.Set(vertices, count);
-  
+
     return triangle;
 }
 
 void Engine2::ShiftMouseDown(const b2Vec2& p) {
-  m_mouseWorld = p;
+    m_mouseWorld = p;
 
-  if (m_mouseJoint != NULL)
-  {
-    return;
-  }
+    if (m_mouseJoint != NULL)
+    {
+        return;
+    }
 
-  m_bombSpawnPoint = m_mouseWorld;
-  m_bombSpawning = true;
+    m_bombSpawnPoint = m_mouseWorld;
+    m_bombSpawning = true;
 }
 
 void Engine2::LaunchBomb(const b2Vec2& position, const b2Vec2& velocity)
 {
-  bool rigid_body = true;
-  b2Shape *object;
-  switch (shape) {
-    case 'b':     // box
-    default:
-      object = new b2PolygonShape(SpawnBox(position));
-      break;
-    case 'c':     // circle
-      object = new b2CircleShape(SpawnCircle(position));
-      break;
-    case 't':     // triangle
-      object = new b2PolygonShape(SpawnEquilateralTriangle(position));
-      break;
-    case 'l':     // soft body lattice
-      rigid_body = false;
-      MakeLattice(position);
-      break;
+    bool rigid_body = true;
+    b2Shape *object;
+    switch (shape) {
+        case 'b':     // box
+        default:
+            object = new b2PolygonShape(SpawnBox(position));
+            break;
+        case 'c':     // circle
+            object = new b2CircleShape(SpawnCircle(position));
+            break;
+        case 't':     // triangle
+            object = new b2PolygonShape(SpawnEquilateralTriangle(position));
+            break;
+        case 'l':     // soft body lattice
+            rigid_body = false;
+            MakeLattice(position);
+            break;
     }
 
 
 
-  if (rigid_body) {
-      b2BodyDef bd;
-      bd.type = b2_dynamicBody;
-      bd.position = position;
-      bd.bullet = true;
-      m_bomb = m_world->CreateBody(&bd);
-      m_bomb->SetLinearVelocity(velocity);
+    if (rigid_body) {
+        b2BodyDef bd;
+        bd.type = b2_dynamicBody;
+        bd.position = position;
+        bd.bullet = true;
+        m_bomb = m_world->CreateBody(&bd);
+        m_bomb->SetLinearVelocity(velocity);
 
-      b2FixtureDef fd;
-      fd.shape = object;
-      fd.density = 20.0f;
-      fd.restitution = elasticity; // for elastic collision
+        b2FixtureDef fd;
+        fd.shape = object;
+        fd.density = 20.0f;
+        fd.restitution = elasticity; // for elastic collision
 
 //      b2Vec2 minV = position - b2Vec2(0.3f, 0.3f);
 //      b2Vec2 maxV = position + b2Vec2(0.3f, 0.3f);
@@ -172,8 +172,8 @@ void Engine2::LaunchBomb(const b2Vec2& position, const b2Vec2& velocity)
 //      aabb.lowerBound = minV;
 //      aabb.upperBound = maxV;
 
-      m_bomb->CreateFixture(&fd);
-  }
+        m_bomb->CreateFixture(&fd);
+    }
 }
 
 void Engine2::MakeLattice(b2Vec2 position) {
@@ -234,16 +234,21 @@ void Engine2::MakeLattice(b2Vec2 position) {
     m_bomb->CreateFixture(&fd2);
 
 
-    b2Vec2 connectionPoint1 = body1->GetPosition() + b2Vec2(radius, 0);
-    //b2Vec2 connectionPoint2 = body2->GetPosition() - b2Vec2(radius, 0);
-    b2RevoluteJointDef jd;
+
+    b2DistanceJointDef jd;
     jd.bodyA = body1;
     jd.bodyB = body2;
 
-    jd.localAnchorA = body1->GetLocalPoint(connectionPoint1);
-    jd.localAnchorB = body2->GetLocalPoint(connectionPoint1);
+    jd.localAnchorA = b2Vec2(0, 0);
+    jd.localAnchorB = b2Vec2(0, 0);
+
+    jd.minLength = 0;
+    jd.maxLength = 2 * jd.length;
 
     jd.collideConnected = false; // Bodies connected by the joint should not collide
+
+    jd.stiffness = 10.f;
+    jd.damping = 0.5f;
 
     // Optionally set limits and motor features
     // jd.enableLimit = true/false;
@@ -259,33 +264,33 @@ void Engine2::MakeLattice(b2Vec2 position) {
 
 void Engine2::CompleteBombSpawn(const b2Vec2& p)
 {
-  const float multiplier = 30.0f;
-  b2Vec2 vel = m_bombSpawnPoint - p;
-  vel *= multiplier;
-  LaunchBomb(m_bombSpawnPoint, vel);
-  m_bombSpawning = false;
+    const float multiplier = 30.0f;
+    b2Vec2 vel = m_bombSpawnPoint - p;
+    vel *= multiplier;
+    LaunchBomb(m_bombSpawnPoint, vel);
+    m_bombSpawning = false;
 }
-  
-  // Update GUI to add custom controls
-void Engine2::UpdateUI() {
-  ImGui::SetNextWindowPos(ImVec2(10.0f, 100.0f));
-  ImGui::SetNextWindowSize(ImVec2(290.0f, 400.0f));
-  ImGui::Begin("Controls", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-  
-  ImGui::PushItemWidth(150); // Set the item width right after beginning the window
 
-  if (ImGui::SliderFloat("Elasticity", &elasticity, 0.0f, 1.0f));
-  
-  // Buttons to spawn our basic primitives: Box, Circle, Triangle
-  // Spawn by Shift + Left Mouse Click
-  if (ImGui::Button("Spawn Box")) {
-    shape = 'b';
-  }
-  if (ImGui::IsItemHovered()) {
-    ImGui::BeginTooltip();
-    ImGui::Text("Spawns a box");
-    ImGui::EndTooltip();
-  }
+// Update GUI to add custom controls
+void Engine2::UpdateUI() {
+    ImGui::SetNextWindowPos(ImVec2(10.0f, 100.0f));
+    ImGui::SetNextWindowSize(ImVec2(290.0f, 400.0f));
+    ImGui::Begin("Controls", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+
+    ImGui::PushItemWidth(150); // Set the item width right after beginning the window
+
+    if (ImGui::SliderFloat("Elasticity", &elasticity, 0.0f, 1.0f));
+
+    // Buttons to spawn our basic primitives: Box, Circle, Triangle
+    // Spawn by Shift + Left Mouse Click
+    if (ImGui::Button("Spawn Box")) {
+        shape = 'b';
+    }
+    if (ImGui::IsItemHovered()) {
+        ImGui::BeginTooltip();
+        ImGui::Text("Spawns a box");
+        ImGui::EndTooltip();
+    }
 
   ImGui::Indent();
   if (ImGui::SliderFloat("Height", &length, 0.01f, 10.0f));
@@ -326,12 +331,12 @@ void Engine2::UpdateUI() {
   ResetGravity();
   }
 
-  if (ImGui::Button("Soft Body Rectangular")) {
-      shape = 'l';      // Lattice
-  }
+    if (ImGui::Button("Soft Body Rectangular")) {
+        shape = 'l';      // Lattice
+    }
 
-  if (ImGui::SliderInt("Height", &lattice_height, 1, 20));
-  if (ImGui::SliderInt("Width", &lattice_width, 1, 20));
+    if (ImGui::SliderInt("Height", &lattice_height, 1, 20));
+    if (ImGui::SliderInt("Width", &lattice_width, 1, 20));
 
 
   if (ImGui::IsItemHovered()) {
@@ -363,8 +368,8 @@ void Engine2::UpdateUI() {
 
 
 
-  ImGui::PopItemWidth(); // Reset the item width after setting all sliders and buttons
-  ImGui::End();
+    ImGui::PopItemWidth(); // Reset the item width after setting all sliders and buttons
+    ImGui::End();
 }
 
 //  static Test *Create() { return new Engine2; }
