@@ -46,12 +46,7 @@
         <table>
             <tr>
                 <td align="center">
-                    <img src="images/box2d-logo.svg" />
-                    <figcaption>Box2D logo</figcaption>
-                </td>
-                <td align="center">
-                    <img src="images/milestone-screenshot.png" />
-                    <figcaption>Project screenshot</figcaption>
+                    <img src="images/main-gif.gif" />
                 </td>
             </tr>
         </table>
@@ -72,24 +67,15 @@
     <!-- Page Content -->
     <pre class="subsection"> ABSTRACT</pre>
     <p>
-        This website concerns a final project made for UC Berkeley’s
-        <a href="https://cs184.eecs.berkeley.edu/sp24">Computer Science 184: Computer Graphics and Imaging</a>
-        class for undergraduate students. Our project is a 2D physics engine
-        open-ended for changes and future improvements. This project was made by
-        Aaron Xu, Henry Khaung, Abrar Karim, and Wil Rothman. The public GitHub
-        repository can be found
-        <a href="https://github.com/omijimo/Engine-?tab=readme-ov-file">here</a>.
+        In Engine², we created a 2D physics sandbox that gives the user the ability to spawn objects of different sizes, shapes, and physical properties and drag them around to observe physical interactions. The users can choose between a variety of primitive, rigid body shapes, or a soft body object to spawn, and customize properties such as dimensions, mass, and elasticity. We based the engine off of Box2D, a physics engine built for games, which we then modified to include our own custom, modifiable “playground”. In this playground, the user can add in circles, squares, triangles, rigid and soft bodies to see how they interact with each other by collision or how they would get affected by gravity or other external forces.
     </p>
-
-    <pre class="subsection"> KEYWORDS</pre>
-    <p>
-        Border, Collision, Engine, Objects/Primitives/Shapes, Rigid Body Physics,
-        Simulation, Soft Body Physics
-    </p>
-
+<pre class=”subsection”> Technical Approach </pre>
     <pre class="subsection">1 INTRODUCTION</pre>
+<p>
+Here at Engine², we believe that your fancy GPUs and computing power shouldn’t be used to render scenery, but rather for realistic physics simulations. See, if you really wanted to see low latency, high resolution, real time infinite recursion path tracing, you would just go outside and touch grass. But you know what you can’t do in real life? Witness perfectly elastic collisions on a zero friction surface. At Engine², we got you covered, from your basic high school physics collisions to realistic soft body simulations. 
+</p>
     <p>
-        So far, we have accomplished much in our project. To start off, after
+        When beginning our project, after 
         checking out a few options for physics frameworks to base our engine off
         of, we have decided to use Erin Catto’s Box2D due to its simplicity and
         ease of access. Box2D contains all of the necessary components to simulate
@@ -99,19 +85,28 @@
         easily create tests and implement our project within the built in testing
         environment for Box2D, which can simulate an environment with Box2D’s
         physics simulation engine. Starting from there, we created a new test
-        called Engine2 to begin implementing our project.
+        called Engine<sup>2</sup> to begin implementing our project. The Engine<sup>2</sup> is based off of the engine already implemented by Box2D but with support for the custom things we wanted to implement.
     </p>
-
     <pre class="subsection">2 WORLD</pre>
     <p>
         In order to contain primitives (also known as “shapes” or “objects”) in
         our simulation, we created a rectangular border that is not affected by
         gravity or any other properties of physics. This rectangle will be our
         “world” in which we spawn primitives and have them interact with each
-        other. In the future, we may try to add new worlds with different shapes
-        and environments.
+        other. This allows us to have a sort of “playground” in which we can test out both our primitives as well as our implementation of collision as well as gravity. We would also not allow primitives to be spawned outside of our square since one of the issues that we noticed with the original Box2D engine was that if we collide two objects with enough force, that object can fly off screen. Additionally, since we implemented soft-body physics, we needed to see how these soft-bodies would interact with the ground/if they get hit on the sides, which would not be possible to see if we did not set some limitations on the world.
     </p>
-
+<p>
+To implement the world, we used Box2d’s built in b2body class. Using this, we were able to create walls that stretched from 4 points given by the origin and the width and height of the box. By using a width and height variable, we can make it so that users can easily change the size of the box after starting the program. To actually resize the box, we need to create new “fixtures”, which are what the green walls are formally, stretching between 4 new points given by the new width and height, which were edited through sliders on the UI. A problem we ran into was that when creating new fixtures, the old fixtures weren’t destroyed and instead just ended up overlapping with each other. The Box2D code does give a function to destroy fixtures to solve this problem, and fixtures themselves are inherently linked lists so it would be easy to destroy all fixtures. However, it actually isn’t possible to access these member functions from anywhere since they are not public, so to delete the old fixtures we had to keep track of references to the fixtures elsewhere. After doing that, we were able to successfully resize the arena. 
+</p>
+<div align = “middle”>
+<table style="width:100%">
+        <tr align="center">
+          <td>
+            <img src="images/world-1.png" align="middle" width="300vw" />
+          </td>
+        </tr>
+      </table>
+<div>
     <pre class="subsection">3 PRIMITIVE GENERATION</pre>
     <p>
         The Box2D starter code was very basic and did not include support for
@@ -121,23 +116,29 @@
         circles and squares. To do this, we implemented a feature where users can
         spawn a selected primitive at the position of their mouse cursor using
         shift click. We also added support for dragging primitives around as
-        opposed to simply spawning them. In the future, we plan to implement a
-        feature that allows users to select an already spawned or yet to be
-        spawned primitive and change its material properties. Currently, spawned
-        primitives have predetermined properties, such as size and mass.
+        opposed to simply spawning them. Secondly, after seeing that we had implemented basic primitives correctly, we created triangles. This was initially difficult to do since for circles and squares, the <code>b2_API</code> and <code>b2PolygonShape</code> (which the initial primitives were based upon), did not support triangles, so we had to create triangles from scratch. After being able to spawn in triangles, we added in support for collision detection. Currently, spawned primitives have predetermined properties, such as size and mass. We wanted to add in custom properties so that the user can add in extra primitives, and modify their size, mass, etc and we were able to do so by creating sliders that the user can modify and change their parameters.
     </p>
-
-    <pre class="subsection">4 FORCES</pre>
-    <p>
-        Currently there are only two forces acting upon the primitives: gravity
-        and user defined force (which can be applied through clicking and then
-        dragging). Users can interact with primitives by clicking on a primitive
-        to lift, push, and pull. We plan to add a feature that changes the mouse
-        cursor to exert a constant pushing force around it, as well as other
-        forces that can be exhibited by the mouse, such as creating a
-        pendulum-like effect with the mouse when holding primities, or maybe
-        sucking in nearby primitives.
-    </p>
+<p>
+To implement primitive generation, we knew that we needed to generate b2PolygonShapes or b2CircleShapes. To allow the user to do this at will, we wanted to allow users to spawn primities at their mouse cursor at will. To do this, we used and overrode the ShiftMouseDown function, which was already part of the testing framework. We made it so that when a user shift clicks, the ShiftMouseDown function is called and checks for which type of object we want to spawn and polls the user’s mouse’s position and passes that into our spawnBox/spawnCircle/spawnEquilateralTriangle code. The simulation of the object ie the forces acted upon an object is taken care of by b2Body which comes with the Box2D starter code. This applies forces like a user dragging an object and throwing it and gravity in real time. Using the UI, we created a button for spawning each of the different primitives and when that button is pressed, a variable that stores the current shape is changed. So when ShiftMouseDown is called, the primitive that matches the current shape is spawned at the position of the cursor. Other things, such as the size and mass of the objects, are changed in the UI and stored in a variable that is referenced whenever a primitive is spawned.
+</p>
+<div align = “middle”>
+<table style="width:100%">
+        <tr align="center">
+          <td>
+            <img src="images/primitive-square.png" align="middle" width="300vw" />
+          </td>
+          <td>
+            <img src="images/primitive-circle.png" align="middle" width="300vw" />
+          </td>
+        </tr>
+        <br>
+        <tr>
+          <td>
+            <img src="images/primitive-triangle.png" align="middle" width="300vw" />
+          </td>
+        </tr>
+      </table>
+<div>
 
     <pre class="subsection">5 COLLISIONS</pre>
     <p>
@@ -149,26 +150,73 @@
         We want to implement soft body physics with spring body masses which can
         exhibit a variety of material properties, such as hardness, strength, and
         elasticity, which would ultimately allow primities to interact in
-        fundamentally different ways with themselves and the environment.
+        fundamentally different ways with themselves and the environment. Additionally, the source code did not support all the primitives that we had created on top of the soft body (such as the triangles) so we had to implement these manually. We were able to do so by referring to the source code for inspiration and then making modifications as needed. In addition to that, we had to implement collisions for soft-body physics from scratch, which at first thought seemed daunting since we did not have much to rely upon. However, after looking through project 4’s code and some helpful videos on youtube, we were able to use their high level implementation to create a working version to our standard. In addition to collision, we also have to consider the forces that would act upon the objects.  Currently there are only two forces acting upon the primitives: gravity and user defined force (which can be applied through clicking and then dragging). Users can interact with primitives by clicking on a primitive to lift, push, and pull, essentially dragging them around. By dragging them around, we can artificially create “force” and see how these primitives react to external force as well as if some force was enacted upon, would they still upload Newton’s laws. After some initial debugging, we managed to implement both correctly. So, if you drag a primitive around, it will maintain that momentum until acted upon by another object. Additionally, if we exert some force on a primitive, we can make it bounce off of the walls that we had pre-defined. We had planned to add a feature that changes the mouse cursor to exert a constant pushing force around it, as well as other forces that can be exhibited by the mouse, such as creating a pendulum-like effect with the mouse when holding primities, or maybe sucking in nearby primitives. However, due to time limitations, we had made some progress on these additional features but nothing to the standard we had envisioned so ultimately, we had decided to scrap them.
     </p>
 
-    <pre class="subsection">6 CONCLUSION AND FUTURE WORK</pre>
+    <pre class="subsection">6 UI</pre>
     <p>
-        In conclusion, we have made good progress on our project towards our goal
-        of creating a realistic and interactive 2d physics sandbox engine, having
-        implemented very basic functionality of spawning objects and moving them
-        around. Moving forward, we plan to implement custom materials and objects
-        using spring bodies, and also continue adding more features to our
-        simulation.
+        We used Imgui to implement the UI for the project. Since our testing area is completely different from the source code, we created an additional UI box. The UI houses the controls for users to interact with the simulation, containing relevant buttons for spawning different shapes changing the gravity, arena size, or elasticity. The UI also contains sliders for adjusting values for the dimensions or mass of spawned objects. This part was not that difficult since it was mainly UI, and the most difficult part was connecting the sliders for the values of the objects with the actual code for changing the values. However, we referred to the source code and modified it accordingly to fit our needs. Namely, we added all the customization for spawning different objects in the UI, with sliders for object sizes and mass, elasticity, gravity, arena size, and soft body properties. Some challenges we ran into while implementing the UI was some clipping with the sliders, where no matter how wide we made the window, the slider would always be wider and clip into the side. We fixed this by setting the sliders to be a constant length.
     </p>
+<div align = “middle”>
+<table style="width:100%">
+        <tr align="center">
+          <td>
+            <img src="images/custom-ui.png" align="middle" width="300vw" />
+          </td>
+        </tr>
+      </table>
+<div>
 
-    <pre class="subsection"> ACKNOWLEDGEMENTS</pre>
-    <p>
-        This document has been fitted to ACM SIGGRAPH style, as specified
-        <a href="https://www.siggraph.org/preparing-your-content/author-instructions/">here</a>. This website features a
-        two-column PDF view, consistent with the
-        guidelines.
-    </p>
-</body>
+   <pre class=”subsection”>7 SOFT BODY PHYSICS</pre>
+  <p>
+Up until now, we have been discussing 2D physics in the context of <it>rigid bodies</it>. <strong>Rigid bodies</strong> are objects  that cannot be deformed, and whose components do not experience different relative motions. To put it explicitly, they cannot bend, compress, stretch, or change shape whatsoever, regardless of force. Note that, as per the perfect nature of rigid bodies, they are physically impossible in the real world and only serve as a simplified model of physical objects. They are particularly useful in simulations where deformation is not expected and can be ignored, such as vehicles or particles.
+<br>
+This is in contrast with <strong>soft body physics</strong>, which are more realistic objects that <it>can</it> be deformed in response to force. A <it>soft body physics engine</it> can produce a simulation with particularly convincing elastic materials, such as rubber, latex, or skin. Soft body physics can be computationally and conceptually complicated, so it serves useful to have a close approximation. Our engine uses such an approximation for soft body physics.
+<br>
+Our model uses a <strong>mass spring model</strong>, in which point masses are connected with springs in a grid. Point masses are nodes with mass, and in our engine, we used tiny rigid body circle, which we implemented much earlier in the project. As for our spring masses, we used elastic distance joints  with <it>structural</it>, <it>shearing</it>, and <it>bending</it> constraints, allowing for a high degree of flexibility and deformation. Our simulation allows the developer to specify the <strong>height</strong> and <strong>width</strong> dimensions of their rectangular soft body lattice, as well as the springs' <strong>damping</strong> and <strong>stiffness</strong> factors, which determines the magnitude of the force opposing the spring's motion and how much the spring resists deformation, respectively. Please note that these parameters need to be carefully set to ensure the simulation works properly. When these parameters are too low, the lattice can collapse in on itself. When they are too high, they act too rigid. We believe the freedom to choose these parameters will serve to make simulations better.
+<br>
+Like any model, there are-- of course-- limitations to our soft body implementation. This model cannot simulate more complex deformations such as those seen in non-linear or stress/strain relationships. Our model also does not respond well to compression nor expansion. This is not the only model we have to implement soft body physics-- we could implement a pressure model, for example. These limitations highlight the fact that our simulation can always be better, and there is always room to improve.
+<br>
+We referenced the YouTube video <a href=”ref=”https://www.youtube.com/watch?v=kyQP4t_wOGI”>Soft Body Physics Explained</a> in our implementation.
+  </p>
+<div align = “middle”>
+<table style="width:100%">
+        <tr align="center">
+          <td>
+            <img src="images/soft-body-1.png" align="middle" width="300vw" />
+          </td>
+          <td>
+            <img src="images/soft-body-2.png" align="middle" width="300vw" />
+          </td>
+        </tr>
+        </tr>
 
+      </table>
+<div>
+
+<pre class = “subsection”> What We Couldn’t Do / Future Implementations </pre>
+<p>
+After implementing soft body physics, we wanted to create a particle based fluid simulation leveraging a similar approach to our previous work with mass point lattice systems. In our simulation, a particle is represented by a struct which contains the shape of the particle, specifically a triangle, along with its velocity and position. We were able to implement the creation of particles but, since representing a fluid requires a lot of particle generation to begin with, our program struggled to keep track of all these particles and simulate the next position and velocity in real time. We were unable to make optimizations due to time constraints of this project although we did attempt to use an array list for better lookup time for velocities and positions of particles.
+</p>
+<p>
+We also wanted to implement more features for soft body physics. Currently, we only have one representation which is our rectangle shaped soft body. In the future, we want to represent our other two objects, triangle and circle, as soft bodies as well. We also want to add one more property – pressure to our soft body for better shape preservation, elastic response, and overall more accurate deformations.
+<p>
+<pre class = “subsection”> REFERENCES </pre>
+<p>
+<a href=”https://www.tapirgames.com/blog/open-source-physics-engines”>list of open source physics engines</a>
+<a href=”https://box2d.org/documentation/index.html”> Documentation of box2D, a really popular 2d physics engine.</a>
+<a href=””>object deformation video by 3blue1brown</a>
+<a href=”https://www.sciencedirect.com/science/article/abs/pii/S0921509308006047”>Material properties for process simulation</a>
+<a href=”https://www.nature.com/articles/s43588-023-00407-4 ”>Simulating short-range order in compositionally complex materials</a>
+<a href=”https://scholarworks.calstate.edu/downloads/z890s004h”>A comprehensive analysis/explanation of various physics engines</a>
+<a href=”https://www.youtube.com/watch?v=kyQP4t_wOGI”> Soft Body Physics Explained</a>
+</p>
+<pre class = “subsection”> CONTRIBUTIONS </pre>
+Aaron contributed to implementing rigid bodies, resizing objects and masses, changing gravity, resizing the arena, all relevant UI controls, and the milestone video and presentation, and deliverables.
+Henry contributed to implementation of rigid bodies and an attempt to make particle-based fluid simulation work, a mouse cursor push function, and the project deliverables.
+Wil contributed to implementing rigid bodies, soft bodies, shapes, the Milestone website and the project deliverables.
+Abrar contributed to implementing rigid bodies, slightly contributed to soft bodies, spring physics and the project deliverables.
+    </body>
 </html>
+
+
