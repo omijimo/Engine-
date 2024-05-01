@@ -100,7 +100,7 @@ b2PolygonShape Engine2::SpawnEquilateralTriangle(const b2Vec2& p) {
     b2PolygonShape triangle;
 
     // Constant defining the side-length of the triangle.
-    const float hs = 1.0f;
+    const float hs = triangle_size;
     const float angle = 0.0f;
 
     const float height = (sqrt(3.0f) / 2.0f) * (2.0f * hs);
@@ -358,12 +358,19 @@ void Engine2::UpdateUI() {
   }
   
   ImGui::Indent();
-  if (ImGui::SliderFloat("Gravity X", &gravityX, -50.0f, 50.0f));
-  if (ImGui::SliderFloat("Gravity Y", &gravityY, -50.0f, 50.0f));
+  if (ImGui::SliderFloat("Gravity X", &gravityX, -100.0f, 100.0f));
+  if (ImGui::SliderFloat("Gravity Y", &gravityY, -100.0f, 100.0f));
   ImGui::Unindent();
 
   if (ImGui::Button("Soft Body Rectangular")) {
         shape = 'l';      // Lattice
+    }
+
+
+    if (ImGui::IsItemHovered()) {
+        ImGui::BeginTooltip();
+        ImGui::Text("Creates a soft body object");
+        ImGui::EndTooltip();
     }
 
     if (ImGui::SliderInt("Lattice Height", &lattice_height, 1, 20));
@@ -372,11 +379,6 @@ void Engine2::UpdateUI() {
     if (ImGui::SliderFloat("Stiffness", &lattice_damping, 0.01f, 20.f));
 
 
-    if (ImGui::IsItemHovered()) {
-        ImGui::BeginTooltip();
-        ImGui::Text("Creates a soft body object");
-        ImGui::EndTooltip();
-    }
 
 
   if (ImGui::Button("Reset Arena")) {
