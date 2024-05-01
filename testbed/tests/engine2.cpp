@@ -177,90 +177,109 @@ void Engine2::LaunchBomb(const b2Vec2& position, const b2Vec2& velocity)
 }
 
 void Engine2::MakeLattice(b2Vec2 position) {
+    /** Creates an n x m lattice as a soft body given `lattice_height` and `width` */
     if (lattice_height < 1 || lattice_width < 1) {      // Edge case
         cout << "Invalid Dimensions. " << lattice_height << " x " << lattice_width << " is not a valid rectangular soft body lattice.";
         return;
     }
 
+    std::vector<b2Body*> bodies;
 
-    // DEBUG
-    // TODO: 1x2, 2x2, nxm
-    lattice_height = 1;
-    lattice_width = 2;
+    cout << "Computing Lattice Geometry..." << endl;
+    for (int n = 0; n < lattice_height; n++) {
+        for (int m = 0; m < lattice_width; m++) {
+            // Defines the geometry of our joint structure
+            b2Vec2 mp_position = position
+                    - 1.f/2 * joint_length * b2Vec2((float) lattice_width, (float) lattice_height)     // first point
+                    + joint_length * b2Vec2((float) m, (float) n);
+            b2Vec2 mp_velocity = b2Vec2(0, 0);
 
-    b2Vec2 mp1_position = b2Vec2(position.x - 0.5f, position.y);
-    b2Vec2 mp2_position = b2Vec2(position.x + 0.5f, position.y);
-    b2Vec2 mp1_velocity = b2Vec2(0, 0);
-    b2Vec2 mp2_velocity = b2Vec2(0, 0);
+            MassPoint* mp = new MassPoint(mp_position, mp_velocity);
 
-    MassPoint* mp1 = new MassPoint(mp1_position, mp1_velocity);
-    MassPoint* mp2 = new MassPoint(mp2_position, mp2_velocity);
+            b2BodyDef bd;
+            bd.type = b2_dynamicBody;
+            bd.position = mp->position;
+            bd.bullet = true;
+            b2Body *body = m_world->CreateBody(&bd);
+            m_bomb = body;
+            m_bomb->SetLinearVelocity(mp->velocity);
 
-    b2BodyDef bd1;
-    bd1.type = b2_dynamicBody;
-    bd1.position = mp1->position;
-    bd1.bullet = true;
-    b2Body *body1 = m_world->CreateBody(&bd1);
-    m_bomb = body1;
-    m_bomb->SetLinearVelocity(mp1->velocity);
+            b2FixtureDef fd;
+            b2CircleShape circle;
+            circle.m_radius = circle.m_radius = mp->radius;
+            fd.shape = new b2CircleShape(circle);
+            fd.density = mp->mass;
+            // TODO: change elasticity to our own ??
+            fd.restitution = elasticity; // for elastic collision
 
-    b2FixtureDef fd1;
-    b2CircleShape circle1;
-    circle1.m_radius = circle1.m_radius = mp1->radius;
-    fd1.shape = new b2CircleShape(circle1);
-    fd1.density = mp1->mass;
-    // TODO: change elasticity to our own ??
-    fd1.restitution = elasticity; // for elastic collision
+            m_bomb->CreateFixture(&fd);
+            bodies.push_back(body);
+        }
+    }
+//    cout << "Lattice Geometry Computed!" << endl;
+//    cout << "Lattice size: " << bodies.size() << endl;
+//    cout << "Calculating Lattice Topology..." << endl;
 
-    m_bomb->CreateFixture(&fd1);
+    // Defines the topology of our joint structure
+    for (int n = 0; n < lattice_height; n++) {
+        for (int m = 0; m < lattice_width; m++) {
+//            cout << "n, m = " << n << ", " << m << endl;
+            // Each RigidBody needs to check if it needs down-left, down, down-right, or right joints.
+            // The other ones should already be there
 
+//            cout << "Going into if clauses ..." << endl;
+            // Check down-left
+            if (n < lattice_height - 1 && m > 0) {
+//                cout << "Down left" << endl;
+//                std::cout << "Edge (" << n << ", " << m << ") - (" << n + 1 << ", " << m - 1 << ")" << endl;
+                CreateJoint(bodies[n * lattice_width + m], bodies[(n + 1) * lattice_width + (m - 1)]);
+            }
+            // Check down
+            if (n < lattice_height - 1) {
+//                cout << "Down" << endl;
+//                std::cout << "Edge (" << n << ", " << m << ") - (" << n + 1 << ", " << m << ")" << endl;
+                CreateJoint(bodies[n * lattice_width + m], bodies[(n + 1) * lattice_width + m]);
+            }
+            // Check down-right
+            if (n < lattice_height - 1 && m < lattice_width - 1) {
+//                cout << "Down right" << endl;
+//                std::cout << "Edge (" << n << ", " << m << ") - (" << n + 1 << ", " << m + 1 << ")" << endl;
+                CreateJoint(bodies[n * lattice_width + m], bodies[(n + 1) * lattice_width + (m + 1)]);
+            }
+            // Check right
+            if (m < lattice_width - 1) {
+//                cout << "Right" << endl;
+//                std::cout << "Edge (" << n << ", " << m << ") - (" << n << ", " << m + 1 << ")" << endl;
+                CreateJoint(bodies[n * lattice_width + m], bodies[(n * lattice_width + m + 1)]);
+            }
+        }
+    }
 
-    b2BodyDef bd2;
-    bd2.type = b2_dynamicBody;
-    bd2.position = mp2->position;
-    bd2.bullet = true;
-    b2Body *body2 = m_world->CreateBody(&bd2);
-    m_bomb = body2;
-    m_bomb->SetLinearVelocity(mp2->velocity);
+//    cout << "Lattice Topology Calculated!" << endl;
+}
 
-    b2FixtureDef fd2;
-    b2CircleShape circle2;
-    circle2.m_radius = circle2.m_radius = mp2->radius;
-    fd2.shape = new b2CircleShape(circle2);
-    fd2.density = mp2->mass;
-    // TODO: change elasticity to our own ??
-    fd2.restitution = elasticity; // for elastic collision
-
-    m_bomb->CreateFixture(&fd2);
-
-
-
+void Engine2::CreateJoint(b2Body* body_a, b2Body* body_b) {
     b2DistanceJointDef jd;
-    jd.bodyA = body1;
-    jd.bodyB = body2;
-
+    jd.bodyA = body_a;
+    jd.bodyB = body_b;
     jd.localAnchorA = b2Vec2(0, 0);
     jd.localAnchorB = b2Vec2(0, 0);
 
     jd.minLength = 0;
-    jd.maxLength = 2 * jd.length;
+   // jd.maxLength = 2 * jd.length;
 
     jd.collideConnected = false; // Bodies connected by the joint should not collide
 
-    jd.stiffness = 10.f;
-    jd.damping = 0.5f;
-
-    // Optionally set limits and motor features
-    // jd.enableLimit = true/false;
-    // jd.lowerAngle = ...; // example values in radians
-    // jd.upperAngle = ...; // example values in radians
-    // jd.enableMotor = true/false;
-    // jd.motorSpeed = ...; // speed in radians per second
-    // jd.maxMotorTorque = ...; // torque in N*m
+    jd.stiffness = lattice_stiffness;
+    jd.damping = lattice_damping;
+    jd.length = joint_length;
 
     // Create the joint in the world
-    b2Joint* joint = m_world->CreateJoint(&jd);
+    m_world->CreateJoint(&jd);
+
+
 }
+
 
 void Engine2::CompleteBombSpawn(const b2Vec2& p)
 {
@@ -274,7 +293,7 @@ void Engine2::CompleteBombSpawn(const b2Vec2& p)
 // Update GUI to add custom controls
 void Engine2::UpdateUI() {
     ImGui::SetNextWindowPos(ImVec2(10.0f, 100.0f));
-    ImGui::SetNextWindowSize(ImVec2(290.0f, 400.0f));
+    ImGui::SetNextWindowSize(ImVec2(295.0f, 580.0f));
     ImGui::Begin("Controls", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
     ImGui::PushItemWidth(150); // Set the item width right after beginning the window
@@ -331,13 +350,6 @@ void Engine2::UpdateUI() {
   ResetGravity();
   }
 
-    if (ImGui::Button("Soft Body Rectangular")) {
-        shape = 'l';      // Lattice
-    }
-
-    if (ImGui::SliderInt("Height", &lattice_height, 1, 20));
-    if (ImGui::SliderInt("Width", &lattice_width, 1, 20));
-
 
   if (ImGui::IsItemHovered()) {
     ImGui::BeginTooltip();
@@ -350,9 +362,25 @@ void Engine2::UpdateUI() {
   if (ImGui::SliderFloat("Gravity Y", &gravityY, -50.0f, 50.0f));
   ImGui::Unindent();
 
+  if (ImGui::Button("Soft Body Rectangular")) {
+        shape = 'l';      // Lattice
+    }
+
+    if (ImGui::SliderInt("Lattice Height", &lattice_height, 1, 20));
+    if (ImGui::SliderInt("Lattice Width", &lattice_width, 1, 20));
+    if (ImGui::SliderFloat("Damping", &lattice_stiffness, 1.f, 200.f));
+    if (ImGui::SliderFloat("Stiffness", &lattice_damping, 0.01f, 20.f));
+
+
+    if (ImGui::IsItemHovered()) {
+        ImGui::BeginTooltip();
+        ImGui::Text("Creates a soft body object");
+        ImGui::EndTooltip();
+    }
+
 
   if (ImGui::Button("Reset Arena")) {
-    ResetGravity();
+    SetGround();
   }
   if (ImGui::IsItemHovered()) {
     ImGui::BeginTooltip();

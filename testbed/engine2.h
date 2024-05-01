@@ -51,9 +51,13 @@ public:
     // elasticity -- applies to next spawned object
     float elasticity = 1.0f;
 
-    int lattice_height = 10;
-    int lattice_width = 10;
+    int lattice_height = 2;
+    int lattice_width = 2;
 
+    float joint_length = 0.5f;       // This is the length of non-diagonal joints
+
+    float lattice_stiffness = 20.f;
+    float lattice_damping = 1.f;
     Engine2();
 
     b2PolygonShape SpawnBox(const b2Vec2& p);
@@ -66,6 +70,7 @@ public:
     b2Body* UpdateGround();
     void SetGround();
     void ResetGravity();
+    void CreateJoint(b2Body* body_a, b2Body* body_b);
 
     // For soft bodies
     void MakeLattice(b2Vec2 position);
