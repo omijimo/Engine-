@@ -1,11 +1,11 @@
 #include "test.h"
 #include "engine2.h"
 #include "imgui/imgui.h"
-#include <ratio>
 #include <stdlib.h>
 #include "MassPoint.h"
 #include <stdio.h>
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -57,9 +57,6 @@ b2Body* Engine2::UpdateGround() {
   currGround = ground;
   return ground;
 }
-
-
-
 Engine2::Engine2() {
 
   ResetGravity();
@@ -76,9 +73,9 @@ void Engine2::ResetGravity() {
 }
 
 void Engine2::SetGround() {
-
-    UpdateGround();
+  UpdateGround();
 }
+
 
 b2PolygonShape Engine2::SpawnBox(const b2Vec2& p) {
     b2PolygonShape box;
@@ -100,7 +97,7 @@ b2PolygonShape Engine2::SpawnEquilateralTriangle(const b2Vec2& p) {
     b2PolygonShape triangle;
 
     // Constant defining the side-length of the triangle.
-    const float hs = triangle_size;
+    const float hs = 1.0f;
     const float angle = 0.0f;
 
     const float height = (sqrt(3.0f) / 2.0f) * (2.0f * hs);
@@ -176,6 +173,7 @@ void Engine2::LaunchBomb(const b2Vec2& position, const b2Vec2& velocity)
     }
 }
 
+
 void Engine2::MakeLattice(b2Vec2 position) {
     /** Creates an n x m lattice as a soft body given `lattice_height` and `width` */
     if (lattice_height < 1 || lattice_width < 1) {      // Edge case
@@ -185,7 +183,7 @@ void Engine2::MakeLattice(b2Vec2 position) {
 
     std::vector<b2Body*> bodies;
 
-    cout << "Computing Lattice Geometry..." << endl;
+    // cout << "Computing Lattice Geometry..." << endl;
     for (int n = 0; n < lattice_height; n++) {
         for (int m = 0; m < lattice_width; m++) {
             // Defines the geometry of our joint structure
@@ -208,7 +206,7 @@ void Engine2::MakeLattice(b2Vec2 position) {
             b2CircleShape circle;
             circle.m_radius = circle.m_radius = mp->radius;
             fd.shape = new b2CircleShape(circle);
-            fd.density = mp->mass;
+            fd.density = lattice_mass;
             // TODO: change elasticity to our own ??
             fd.restitution = elasticity; // for elastic collision
 
@@ -281,6 +279,9 @@ void Engine2::CreateJoint(b2Body* body_a, b2Body* body_b) {
 }
 
 
+
+
+
 void Engine2::CompleteBombSpawn(const b2Vec2& p)
 {
     const float multiplier = 30.0f;
@@ -293,23 +294,24 @@ void Engine2::CompleteBombSpawn(const b2Vec2& p)
 // Update GUI to add custom controls
 void Engine2::UpdateUI() {
     ImGui::SetNextWindowPos(ImVec2(10.0f, 100.0f));
-    ImGui::SetNextWindowSize(ImVec2(295.0f, 580.0f));
+    ImGui::SetNextWindowSize(ImVec2(300.0f, 600.0f));
     ImGui::Begin("Controls", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
     ImGui::PushItemWidth(150); // Set the item width right after beginning the window
 
-    if (ImGui::SliderFloat("Elasticity", &elasticity, 0.0f, 1.0f));
 
-    // Buttons to spawn our basic primitives: Box, Circle, Triangle
-    // Spawn by Shift + Left Mouse Click
-    if (ImGui::Button("Spawn Box")) {
-        shape = 'b';
-    }
-    if (ImGui::IsItemHovered()) {
-        ImGui::BeginTooltip();
-        ImGui::Text("Spawns a box");
-        ImGui::EndTooltip();
-    }
+  if (ImGui::SliderFloat("Elasticity", &elasticity, 0.0f, 1.0f));
+  
+  // Buttons to spawn our basic primitives: Box, Circle, Triangle
+  // Spawn by Shift + Left Mouse Click
+  if (ImGui::Button("Spawn Box")) {
+    shape = 'b';
+  }
+  if (ImGui::IsItemHovered()) {
+    ImGui::BeginTooltip();
+    ImGui::Text("Spawns a box");
+    ImGui::EndTooltip();
+  }
 
   ImGui::Indent();
   if (ImGui::SliderFloat("Height", &length, 0.01f, 10.0f));
@@ -349,8 +351,6 @@ void Engine2::UpdateUI() {
   if (ImGui::Button("Set Gravity")) {
   ResetGravity();
   }
-
-
   if (ImGui::IsItemHovered()) {
     ImGui::BeginTooltip();
     ImGui::Text("Sets the gravity to the given values");
@@ -358,27 +358,27 @@ void Engine2::UpdateUI() {
   }
   
   ImGui::Indent();
-  if (ImGui::SliderFloat("Gravity X", &gravityX, -100.0f, 100.0f));
-  if (ImGui::SliderFloat("Gravity Y", &gravityY, -100.0f, 100.0f));
+  if (ImGui::SliderFloat("Gravity X", &gravityX, -50.0f, 50.0f));
+  if (ImGui::SliderFloat("Gravity Y", &gravityY, -50.0f, 50.0f));
   ImGui::Unindent();
 
   if (ImGui::Button("Soft Body Rectangular")) {
         shape = 'l';      // Lattice
     }
 
-
-    if (ImGui::IsItemHovered()) {
-        ImGui::BeginTooltip();
-        ImGui::Text("Creates a soft body object");
-        ImGui::EndTooltip();
-    }
-
     if (ImGui::SliderInt("Lattice Height", &lattice_height, 1, 20));
     if (ImGui::SliderInt("Lattice Width", &lattice_width, 1, 20));
     if (ImGui::SliderFloat("Damping", &lattice_stiffness, 1.f, 200.f));
     if (ImGui::SliderFloat("Stiffness", &lattice_damping, 0.01f, 20.f));
+    if (ImGui::SliderFloat("Lattice Mass", &lattice_mass, 0.01f, 10.f));
 
 
+
+    if (ImGui::IsItemHovered()) {
+        ImGui::BeginTooltip();
+        ImGui::Text("Soft body");
+        ImGui::EndTooltip();
+    }
 
 
   if (ImGui::Button("Reset Arena")) {
@@ -398,8 +398,8 @@ void Engine2::UpdateUI() {
 
 
 
-    ImGui::PopItemWidth(); // Reset the item width after setting all sliders and buttons
-    ImGui::End();
+  ImGui::PopItemWidth(); // Reset the item width after setting all sliders and buttons
+  ImGui::End();
 }
 
 //  static Test *Create() { return new Engine2; }

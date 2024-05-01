@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-
 class Engine2 : public Test {
 public:
 
@@ -35,7 +34,7 @@ public:
     float length = 1.0f;
     float box_mass = 1.0f;
   
-    float radius = 1.0f;
+    float radius = 25.f;
     float circle_mass = 1.0f;
   
     float triangle_size = 1.0f;
@@ -58,6 +57,10 @@ public:
 
     float lattice_stiffness = 20.f;
     float lattice_damping = 1.f;
+
+    float lattice_mass = 1.0f;
+
+
     Engine2();
 
     b2PolygonShape SpawnBox(const b2Vec2& p);
@@ -68,8 +71,10 @@ public:
     void CompleteBombSpawn(const b2Vec2& p) override;
     void UpdateUI() override;
     b2Body* UpdateGround();
+
     void SetGround();
     void ResetGravity();
+
     void CreateJoint(b2Body* body_a, b2Body* body_b);
 
     // For soft bodies
