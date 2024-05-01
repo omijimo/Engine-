@@ -22,6 +22,8 @@ public:
     float box_maxX;
     float box_maxY;
 
+    float gravityX = 0.0f;
+    float gravityY = -10.0f;
 
 
     const float k_restitution = 0.0f;
@@ -39,6 +41,7 @@ public:
     float triangle_size = 1.0f;
     float triangle_mass = 1.0f;
 
+    // for setting the arena
     b2Fixture* fixtureList[4];
     bool hasGround = false;
     b2Body* currGround = nullptr;
@@ -59,6 +62,7 @@ public:
     void UpdateUI() override;
     b2Body* UpdateGround();
     void SetGround();
+    void ResetGravity();
 
 };
 

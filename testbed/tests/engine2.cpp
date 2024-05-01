@@ -7,6 +7,8 @@
 #include <iostream>
 
 using namespace std;
+
+// for setting and resetting the ground based on the dimensions
 b2Body* Engine2::UpdateGround() {
   float box_minX = originX - arena_width/2.0;
   float box_minY = originY - arena_height/2.0;
@@ -58,12 +60,18 @@ b2Body* Engine2::UpdateGround() {
 
 
 Engine2::Engine2() {
-  m_world->SetGravity(b2Vec2(0.0f, -10.0f));
+
+  ResetGravity();
 
   // the 'box' in which our objects exist/should not have anything outside it
   currGround = UpdateGround();
 
   
+}
+
+void Engine2::ResetGravity() {
+  m_world->SetGravity(b2Vec2(gravityX, gravityY));
+
 }
 
 void Engine2::SetGround() {
@@ -222,8 +230,24 @@ void Engine2::UpdateUI() {
   if (ImGui::SliderFloat("Triangle Mass", &triangle_mass, 0.1f, 100.0f));
   ImGui::Unindent();
 
+
+  if (ImGui::Button("Set Gravity")) {
+  ResetGravity();
+  }
+  if (ImGui::IsItemHovered()) {
+    ImGui::BeginTooltip();
+    ImGui::Text("Sets the gravity to the given values");
+    ImGui::EndTooltip();
+  }
+  
+  ImGui::Indent();
+  if (ImGui::SliderFloat("Gravity X", &gravityX, -50.0f, 50.0f));
+  if (ImGui::SliderFloat("Gravity Y", &gravityY, -50.0f, 50.0f));
+  ImGui::Unindent();
+
+
   if (ImGui::Button("Reset Arena")) {
-    SetGround();
+    ResetGravity();
   }
   if (ImGui::IsItemHovered()) {
     ImGui::BeginTooltip();
@@ -235,6 +259,9 @@ void Engine2::UpdateUI() {
   if (ImGui::SliderFloat("Arena Width", &arena_width, 1.0f, 250.0f));
   if (ImGui::SliderFloat("Arena Height", &arena_height, 1.0f, 250.0f));
   ImGui::Unindent();
+
+
+
 
   ImGui::PopItemWidth(); // Reset the item width after setting all sliders and buttons
   ImGui::End();
