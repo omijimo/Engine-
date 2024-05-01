@@ -47,7 +47,7 @@ pre + p {
 
 /* Set up the font for the main text */
 p {
-    text-indent: 1.5em;     /* Adds paragraph indenting */
+    /* Adds paragraph indenting */
     margin-bottom: 1em;
     font-size: 20px;
 }
