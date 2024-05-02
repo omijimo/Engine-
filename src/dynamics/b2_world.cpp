@@ -1047,8 +1047,12 @@ void b2World::DrawShape(b2Fixture* fixture, const b2Transform& xf, const b2Color
 			b2Vec2 center = b2Mul(xf, circle->m_p);
 			float radius = circle->m_radius;
 			b2Vec2 axis = b2Mul(xf.q, b2Vec2(1.0f, 0.0f));
-
-			m_debugDraw->DrawSolidCircle(center, radius, axis, color);
+      
+      if (circle->isParticle) {
+        m_debugDraw->DrawSolidCircle(center, radius, axis, b2Color(0.0f, 0.6f, 255.0f));
+      } else {
+        m_debugDraw->DrawSolidCircle(center, radius, axis, color);
+      }
 		}
 		break;
 
@@ -1142,9 +1146,9 @@ void b2World::DebugDraw()
 					DrawShape(f, xf, b2Color(0.6f, 0.6f, 0.6f));
 				}
 				else
-				{
-					DrawShape(f, xf, b2Color(0.9f, 0.7f, 0.7f));
-				}
+        {
+          DrawShape(f, xf, b2Color(0.9f, 0.7f, 0.7f));
+        }
 			}
 		}
 	}

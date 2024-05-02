@@ -1,5 +1,6 @@
 
 set(BOX2D_SOURCE_FILES
+		particle/particleSystem.cpp
 		collision/b2_broad_phase.cpp
 		collision/b2_chain_shape.cpp
 		collision/b2_circle_shape.cpp
@@ -96,7 +97,9 @@ set(BOX2D_HEADER_FILES
 		../include/box2d/b2_world.h
 		../include/box2d/b2_world_callbacks.h
 		../include/box2d/box2d.h
-		../include/box2d/b2_soft_body_joint.h)
+		../include/box2d/b2_soft_body_joint.h
+		../include/box2d/spatialHash.h
+		../include/box2d/particleSystem.h)
 
 add_library(box2d ${BOX2D_SOURCE_FILES} ${BOX2D_HEADER_FILES})
 target_include_directories(box2d

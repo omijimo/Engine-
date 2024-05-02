@@ -1,8 +1,9 @@
 #include "test.h"
 #include "engine2.h"
+#include "MassPoint.h"
+#include "box2d/particleSystem.h"
 #include "imgui/imgui.h"
 #include <stdlib.h>
-#include "MassPoint.h"
 #include <stdio.h>
 #include <iostream>
 #include <vector>
@@ -58,6 +59,9 @@ b2Body* Engine2::UpdateGround() {
   return ground;
 }
 Engine2::Engine2() {
+//  psys = particleSystem(abs(box_minX - box_maxX), abs(box_minY - box_maxY), 0.75f, m_world);
+  
+  pSystem = new particleSystem(abs(box_minX - box_maxX), abs(box_minY - box_maxY), 0.75f, box_minX, box_minY, m_world);
 
   ResetGravity();
 
@@ -114,6 +118,86 @@ b2PolygonShape Engine2::SpawnEquilateralTriangle(const b2Vec2& p) {
     return triangle;
 }
 
+class QueryCallback : public b2QueryCallback
+{
+public:
+  QueryCallback(const b2Vec2& point)
+  {
+    m_point = point;
+    m_fixture = NULL;
+  }
+
+  bool ReportFixture(b2Fixture* fixture) override
+  {
+    b2Body* body = fixture->GetBody();
+    if (body->GetType() == b2_dynamicBody)
+    {
+      bool inside = fixture->TestPoint(m_point);
+      if (inside)
+      {
+        m_fixture = fixture;
+
+        // We are done, terminate the query.
+        return false;
+      }
+    }
+
+    // Continue the query.
+    return true;
+  }
+
+  b2Vec2 m_point;
+  b2Fixture* m_fixture;
+};
+
+void Engine2::MouseDown(const b2Vec2& p)
+{
+    m_mouseWorld = p;
+    
+    if (m_mouseJoint != NULL)
+    {
+      return;
+    }
+  
+    // Make a small box.
+    b2AABB aabb;
+    b2Vec2 d;
+    d.Set(0.001f, 0.001f);
+    aabb.lowerBound = p - d;
+    aabb.upperBound = p + d;
+    
+    // Query the world for overlapping shapes.
+    QueryCallback callback(p);
+    m_world->QueryAABB(&callback, aabb);
+    
+    if (callback.m_fixture)
+    {
+      float frequencyHz = 5.0f;
+      float dampingRatio = 0.7f;
+      
+      b2Body* body = callback.m_fixture->GetBody();
+      b2MouseJointDef jd;
+      jd.bodyA = m_groundBody;
+      jd.bodyB = body;
+      jd.target = p;
+      jd.maxForce = 1000.0f * body->GetMass();
+      b2LinearStiffness(jd.stiffness, jd.damping, frequencyHz, dampingRatio, jd.bodyA, jd.bodyB);
+      
+      m_mouseJoint = (b2MouseJoint*)m_world->CreateJoint(&jd);
+      body->SetAwake(true);
+    }
+  
+    if (particleFlag) {
+      // Create particles at the mouse position
+      // engine_particleSys.createParticlesAroundMouse(engine_particleDef, p, 1.0f, 100, m_world);
+//      psys.createParticle(m_world, pDef, p, 1.0f);
+      
+//      psys.createParticlesAroundMouse(pDef, p, 1.0f, 100, m_world);
+      pSystem->createParticlesAroundMouse(p, 1.0f, 100, m_world);
+    }
+}
+
+
 void Engine2::ShiftMouseDown(const b2Vec2& p) {
     m_mouseWorld = p;
 
@@ -146,8 +230,6 @@ void Engine2::LaunchBomb(const b2Vec2& position, const b2Vec2& velocity)
             MakeLattice(position);
             break;
     }
-
-
 
     if (rigid_body) {
         b2BodyDef bd;
@@ -274,13 +356,7 @@ void Engine2::CreateJoint(b2Body* body_a, b2Body* body_b) {
 
     // Create the joint in the world
     m_world->CreateJoint(&jd);
-
-
 }
-
-
-
-
 
 void Engine2::CompleteBombSpawn(const b2Vec2& p)
 {
@@ -314,9 +390,9 @@ void Engine2::UpdateUI() {
   }
 
   ImGui::Indent();
-  if (ImGui::SliderFloat("Height", &length, 0.01f, 10.0f));
-  if (ImGui::SliderFloat("Width", &width, 0.01f, 10.0f));
-  if (ImGui::SliderFloat("Box Mass", &box_mass, 0.1f, 100.0f));
+  if (ImGui::SliderFloat("Height", &length, 1.0f, 10.0f));
+  if (ImGui::SliderFloat("Width", &width, 1.0f, 10.0f));
+  if (ImGui::SliderFloat("Box Mass", &box_mass, 1.0f, 100.0f));
   ImGui::Unindent();
   
   if (ImGui::Button("Spawn Circle")) {
@@ -329,8 +405,8 @@ void Engine2::UpdateUI() {
   }
   
   ImGui::Indent();
-  if (ImGui::SliderFloat("Radius", &radius, 0.01f, 10.0f));
-  if (ImGui::SliderFloat("Circle Mass", &circle_mass, 0.1f, 100.0f));
+  if (ImGui::SliderFloat("Radius", &radius, 1.0f, 10.0f));
+  if (ImGui::SliderFloat("Circle Mass", &circle_mass, 1.0f, 100.0f));
   ImGui::Unindent();
   
   if (ImGui::Button("Spawn Triangle")) {
@@ -343,8 +419,8 @@ void Engine2::UpdateUI() {
   }
   
   ImGui::Indent();
-  if (ImGui::SliderFloat("Side Length", &triangle_size, 0.01f, 10.0f));
-  if (ImGui::SliderFloat("Triangle Mass", &triangle_mass, 0.1f, 100.0f));
+  if (ImGui::SliderFloat("Side Length", &triangle_size, 1.0f, 10.0f));
+  if (ImGui::SliderFloat("Triangle Mass", &triangle_mass, 1.0f, 100.0f));
   ImGui::Unindent();
 
 
@@ -369,8 +445,8 @@ void Engine2::UpdateUI() {
     if (ImGui::SliderInt("Lattice Height", &lattice_height, 1, 20));
     if (ImGui::SliderInt("Lattice Width", &lattice_width, 1, 20));
     if (ImGui::SliderFloat("Damping", &lattice_stiffness, 1.f, 200.f));
-    if (ImGui::SliderFloat("Stiffness", &lattice_damping, 0.01f, 20.f));
-    if (ImGui::SliderFloat("Lattice Mass", &lattice_mass, 0.01f, 10.f));
+    if (ImGui::SliderFloat("Stiffness", &lattice_damping, 1.0f, 20.f));
+    if (ImGui::SliderFloat("Lattice Mass", &lattice_mass, 1.0f, 10.f));
 
 
 
@@ -379,6 +455,11 @@ void Engine2::UpdateUI() {
         ImGui::Text("Soft body");
         ImGui::EndTooltip();
     }
+  
+  if (ImGui::Button("Particle")) {
+      shape = 'p';
+      particleFlag = !particleFlag;
+  }
 
 
   if (ImGui::Button("Reset Arena")) {
@@ -394,9 +475,6 @@ void Engine2::UpdateUI() {
   if (ImGui::SliderFloat("Arena Width", &arena_width, 1.0f, 250.0f));
   if (ImGui::SliderFloat("Arena Height", &arena_height, 1.0f, 250.0f));
   ImGui::Unindent();
-
-
-
 
   ImGui::PopItemWidth(); // Reset the item width after setting all sliders and buttons
   ImGui::End();

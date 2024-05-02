@@ -309,6 +309,11 @@ void Test::Step(Settings& settings)
 	m_pointCount = 0;
 
 	m_world->Step(timeStep, settings.m_velocityIterations, settings.m_positionIterations);
+  
+  // our particle system
+  if (pSystem && timeStep > 0.0f) {
+    pSystem->update(timeStep);
+  }
 
 	m_world->DebugDraw();
     g_debugDraw.Flush();

@@ -3,6 +3,7 @@
 
 #include "box2d/box2d.h"
 #include "test.h"
+#include "box2d/particleSystem.h"
 #include "imgui/imgui.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -59,13 +60,18 @@ public:
     float lattice_damping = 1.f;
 
     float lattice_mass = 1.0f;
-
+  
+    // particle
+    bool particleFlag = false;
+    particleDef pDef;
+//    particleSystem psys;
 
     Engine2();
 
     b2PolygonShape SpawnBox(const b2Vec2& p);
     b2CircleShape SpawnCircle(const b2Vec2& p);
     b2PolygonShape SpawnEquilateralTriangle(const b2Vec2 &p);
+    void MouseDown(const b2Vec2& p) override;
     void ShiftMouseDown(const b2Vec2& p) override;
     void LaunchBomb(const b2Vec2& position, const b2Vec2& velocity) override;
     void CompleteBombSpawn(const b2Vec2& p) override;

@@ -128,6 +128,9 @@ struct B2_API b2BodyDef
 class B2_API b2Body
 {
 public:
+  
+  bool IsParticle(const b2Body* body);
+  
 	/// Creates a fixture and attach it to this body. Use this function if you need
 	/// to set some fixture parameters, like friction. Otherwise you can create the
 	/// fixture directly from a shape.
@@ -385,6 +388,8 @@ public:
 
 	/// Dump this body to a file
 	void Dump();
+  
+//  bool isParticle = false;
 
 private:
 

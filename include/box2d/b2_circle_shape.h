@@ -55,6 +55,7 @@ public:
 
 	/// Position
 	b2Vec2 m_p;
+  bool isParticle;
 };
 
 inline b2CircleShape::b2CircleShape()
@@ -62,6 +63,7 @@ inline b2CircleShape::b2CircleShape()
 	m_type = e_circle;
 	m_radius = 0.0f;
 	m_p.SetZero();
+  isParticle = false;
 }
 
 #endif
