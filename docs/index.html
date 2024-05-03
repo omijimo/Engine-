@@ -201,7 +201,7 @@ We referenced the YouTube video <a href=”ref=”https://www.youtube.com/watch?
   made it so that only one particle system exists and this system is used to simulate water. The original idea was to have multiple
   particle systems each for one type of fluid but due to time constraints, we were only able to make a particle system that cannot be changed
   by users for only one type of fluid, which is water.
-<br>
+<br><br>
   In order to simulate a fluid, we need a lot of particles to begin with. A lot of particles mean that we have to keep track of each individual position
   as well as velocity of a particle and then compute the next position and velocity. The next position and velocity is determined by
   the three forces that will be acting on a particle. These three forces are: cohesive, separation, and viscous forces.
@@ -209,11 +209,11 @@ We referenced the YouTube video <a href=”ref=”https://www.youtube.com/watch?
   Separation is the force that acts upon a particle if it is too far from other particles and this usually happens when a rigid body is dropped
   onto the fluid. Viscous force helps us simulate how much a particle moves; in the case with water, there is a small viscous force meaning
   water will move a lot. You can think of viscous force as damping from springs and it essentially reduces velocity.
-<br>
+<br><br>
   Computing these forces and their effects on position and velocity can be very computationally intensive. Therefore,
   we decided to use a spatial hash to keep track of a particle's position and velocity. We use this spatial hash to query a particle and check
   if its position and velocity will impact its neighboring particles within a radius.
-<br>
+<br><br>
   We partitioned our 2d world into cells and in these cells, we store our particles. This grid of cells is 
   represented by our spatial hash. Key value of the spatial hash is the hashed value of the x, y coordinate of the particle and this is used
   to access the neighbors of this particular particle within a certain radius. All forces are computed and applied to particle and its 
@@ -245,7 +245,7 @@ this so we ended up only using one particle system for one type of fluid, water.
 particle systems for different types of fluids. Having one particle system means that we have to somehow efficiently keep
 track of the positions and velocities of each particle but having more than one means we have to do that n times. We were unable to figure this out
 and due to time constraints and for simplicity, we just stuck with one particle system.
-<br>
+<br><br>
 Another thing we wanted to do was add textures. Currently, box2d only rasterizes pixels of everything we have done so far but having a textures
 for rigid and soft bodies as well as particles would make our program more visually pleasing.
 <br><br>
