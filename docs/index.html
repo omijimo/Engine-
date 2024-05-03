@@ -58,6 +58,9 @@
         <p>
             <a href="https://drive.google.com/file/d/1Ckof1A-cn7A-vnAiyCTl1KqOILz1CR_1/view?usp=sharing">Video</a>
         </p>
+        <p>
+          <a href="https://docs.google.com/presentation/d/1Hki40-hfSNSbxO3yd3NokqRNHxQiz4UMmdPAHZQ0hTc/edit?usp=sharing">Presentation Slides</a>
+        </p>
 
     </div>
 
@@ -136,7 +139,7 @@ When beginning our project, after
       </table>
 <div>
 
-    <pre class="subsection">5 COLLISIONS</pre>
+    <pre class="subsection">4 COLLISIONS</pre>
     <p>
         Box2D’s source code comes with collisions implemented already so we did
         not have to implement this. However, collisions currently only act as
@@ -151,7 +154,7 @@ When beginning our project, after
         In addition to collision, we also have to consider the forces that would act upon the objects.  Currently there are only two forces acting upon the primitives: gravity and user defined force (which can be applied through clicking and then dragging). Users can interact with primitives by clicking on a primitive to lift, push, and pull, essentially dragging them around. By dragging them around, we can artificially create “force” and see how these primitives react to external force as well as if some force was enacted upon, would they still upload Newton’s laws. After some initial debugging, we managed to implement both correctly. So, if you drag a primitive around, it will maintain that momentum until acted upon by another object. Additionally, if we exert some force on a primitive, we can make it bounce off of the walls that we had pre-defined. We had planned to add a feature that changes the mouse cursor to exert a constant pushing force around it, as well as other forces that can be exhibited by the mouse, such as creating a pendulum-like effect with the mouse when holding primities, or maybe sucking in nearby primitives. However, due to time limitations, we had made some progress on these additional features but nothing to the standard we had envisioned so ultimately, we had decided to scrap them.
       </p>
 
-    <pre class="subsection">6 UI</pre>
+    <pre class="subsection">5 UI</pre>
     <p>
         We used Imgui to implement the UI for the project. Since our testing area is completely different from the source code, we created an additional UI box. The UI houses the controls for users to interact with the simulation, containing relevant buttons for spawning different shapes changing the gravity, arena size, or elasticity. The UI also contains sliders for adjusting values for the dimensions or mass of spawned objects. This part was not that difficult since it was mainly UI, and the most difficult part was connecting the sliders for the values of the objects with the actual code for changing the values. However, we referred to the source code and modified it accordingly to fit our needs. Namely, we added all the customization for spawning different objects in the UI, with sliders for object sizes and mass, elasticity, gravity, arena size, and soft body properties. Some challenges we ran into while implementing the UI was some clipping with the sliders, where no matter how wide we made the window, the slider would always be wider and clip into the side. We fixed this by setting the sliders to be a constant length.
     </p>
@@ -165,7 +168,7 @@ When beginning our project, after
       </table>
 <div>
 
-   <pre class=”subsection”>7 SOFT BODY PHYSICS</pre>
+   <pre class=”subsection”>6 SOFT BODY PHYSICS</pre>
   <p>
 Up until now, we have been discussing 2D physics in the context of <it>rigid bodies</it>. <strong>Rigid bodies</strong> are objects  that cannot be deformed, and whose components do not experience different relative motions. To put it explicitly, they cannot bend, compress, stretch, or change shape whatsoever, regardless of force. Note that, as per the perfect nature of rigid bodies, they are physically impossible in the real world and only serve as a simplified model of physical objects. They are particularly useful in simulations where deformation is not expected and can be ignored, such as vehicles or particles.
 <br><br>
@@ -192,9 +195,59 @@ We referenced the YouTube video <a href=”ref=”https://www.youtube.com/watch?
       </table>
 <div>
 
+<pre class=”subsection”>7 Particle System</pre>
+<p>We also implemented a particle system using one of the rigid body primitives from earlier, circles. We made it so that particles can be 
+  spawned around the user's mouse position. A particle system is implemented so that we can simulate any fluid but in our engine2, we only
+  made it so that only one particle system exists and this system is used to simulate water. The original idea was to have multiple
+  particle systems each for one type of fluid but due to time constraints, we were only able to make a particle system that cannot be changed
+  by users for only one type of fluid, which is water.
+<br>
+  In order to simulate a fluid, we need a lot of particles to begin with. A lot of particles mean that we have to keep track of each individual position
+  as well as velocity of a particle and then compute the next position and velocity. The next position and velocity is determined by
+  the three forces that will be acting on a particle. These three forces are: cohesive, separation, and viscous forces.
+  Cohesive forces help simulate particles being close together; in our case with water, it helps some of the particles/circles stick together.
+  Separation is the force that acts upon a particle if it is too far from other particles and this usually happens when a rigid body is dropped
+  onto the fluid. Viscous force helps us simulate how much a particle moves; in the case with water, there is a small viscous force meaning
+  water will move a lot. You can think of viscous force as damping from springs and it essentially reduces velocity.
+<br>
+  Computing these forces and their effects on position and velocity can be very computationally intensive. Therefore,
+  we decided to use a spatial hash to keep track of a particle's position and velocity. We use this spatial hash to query a particle and check
+  if its position and velocity will impact its neighboring particles within a radius.
+<br>
+  We partitioned our 2d world into cells and in these cells, we store our particles. This grid of cells is 
+  represented by our spatial hash. Key value of the spatial hash is the hashed value of the x, y coordinate of the particle and this is used
+  to access the neighbors of this particular particle within a certain radius. All forces are computed and applied to particle and its 
+  neighboring particles through the use of the spatial hash at each time step. The spatial hash of positions-neighbors are also updated
+  at each time step. Overall, using the spatial hash was essential in reducing the computations of forces at each time map.
+  Additionally, we also added a threshold for velocity for particles in order to prevent the particles from flying too fast; this is a scenario
+  when an object is dropped at a high velocity and impacts the particles causing the separation force on the particle to be really high. 
+  This makes the particles "fly" too fast and essentially, makes the cohesive forces insignificant which subsequently makes the particles
+  bounce.
+</p>
+
+<table style="width:100%">
+  <tr align="center">
+    <td>
+      <img src="images/particleSystem.gif" align="middle" width="400vw" />
+    </td>
+    <td>
+    </td>
+  </tr>
+  </tr>
+
+</table>
+
 <pre class = “subsection”> What We Couldn’t Do / Future Implementations </pre>
 <p>
-After implementing soft body physics, we wanted to create a particle based fluid simulation leveraging a similar approach to our previous work with mass point lattice systems. In our simulation, a particle is represented by a struct which contains the shape of the particle, specifically a triangle, along with its velocity and position. We were able to implement the creation of particles but, since representing a fluid requires a lot of particle generation to begin with, our program struggled to keep track of all these particles and simulate the next position and velocity in real time. We were unable to make optimizations due to time constraints of this project although we did attempt to use an array list for better lookup time for velocities and positions of particles.
+After implementing soft body physics, we were able to create a particle based fluid simulation. Our original goal was to make it so that
+there is more than one fluid that the user can simulate. However, due to complexity of the code base of box2d, we found it hard to incorporate
+this so we ended up only using one particle system for one type of fluid, water. There were also complications with efficiency with multiple
+particle systems for different types of fluids. Having one particle system means that we have to somehow efficiently keep
+track of the positions and velocities of each particle but having more than one means we have to do that n times. We were unable to figure this out
+and due to time constraints and for simplicity, we just stuck with one particle system.
+<br>
+Another thing we wanted to do was add textures. Currently, box2d only rasterizes pixels of everything we have done so far but having a textures
+for rigid and soft bodies as well as particles would make our program more visually pleasing.
 <br><br>
 We also wanted to implement more features for soft body physics. Currently, we only have one representation which is our rectangle shaped soft body. In the future, we want to represent our other two objects, triangle and circle, as soft bodies as well. We also want to add one more property – pressure to our soft body for better shape preservation, elastic response, and overall more accurate deformations.
 </p>
