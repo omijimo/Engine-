@@ -7,7 +7,7 @@ Engine$`^2`$ is a 2D physical sandbox primarily for particle physics and spring 
 Engine$`^2`$ got its source code from Erin Catto's MIT licensed [Box2D](https://github.com/erincatto/box2d?tab=readme-ov-file), a self-described "2D physics engine for games."  
 
 # Controls
-TODO
+Just use your mouse. `P` to pause. `R` to reset.
 
 # Planned Additions
 - Particle Physics
