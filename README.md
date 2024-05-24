@@ -9,11 +9,6 @@ Engine$`^2`$ got its source code from Erin Catto's MIT licensed [Box2D](https://
 # Controls
 Just use your mouse. `P` to pause. `R` to reset.
 
-# Planned Additions
-- Particle Physics
-- Spring Body Physics
-- TODO: add more and be more specific
-
 # Pages
 - [Proposal](https://cal-cs184-student.github.io/hw-webpages-sp24-omijimo/final_project/index.html)
 - [CS184 Staff Feedback From Proposal (access permission required)](https://docs.google.com/document/d/1YXBP9LN1qv50ewL9Yr_OkGzyuR8xmRtOEwQbZD6TnOM/edit)
